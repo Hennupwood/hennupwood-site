@@ -3,37 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hennupwood</title>
+
+<title>Hennupwood BBS</title>
 
 <style>
-body {
-    background: #111;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding-top: 100px;
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
 }
 
-a {
-    color: #66ccff;
-    text-decoration: none;
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
 }
+
+.logo{
+    color:#808080;
+    text-align:center;
+    font-size:14px;
+    line-height:1.1;
+    white-space:pre;
+}
+
+.purple{
+    color:#ff00ff;
+}
+
+.blue{
+    color:#0066ff;
+}
+
+.cyan{
+    color:#00ffff;
+}
+
+.yellow{
+    color:#ffff00;
+}
+
+.gray{
+    color:#999;
+}
+
+.box{
+    border:2px solid #ff00ff;
+    margin-top:20px;
+    padding:20px;
+    box-shadow:0 0 20px #330033;
+}
+
+.menu{
+    margin-top:20px;
+    line-height:2;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity:0;
+    }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
 </style>
-
 </head>
+
 <body>
 
-<h1>Hennupwood</h1>
+<div class="wrapper">
 
-<p>Atmospheric electronic music.</p>
+<div class="logo">
 
-<p>Sound, texture and emotion over perfection.</p>
+██╗  ██╗███████╗███╗   ██╗███╗   ██╗██╗   ██╗██████╗
+██║  ██║██╔════╝████╗  ██║████╗  ██║██║   ██║██╔══██╗
+███████║█████╗  ██╔██╗ ██║██╔██╗ ██║██║   ██║██████╔╝
+██╔══██║██╔══╝  ██║╚██╗██║██║╚██╗██║██║   ██║██╔═══╝
+██║  ██║███████╗██║ ╚████║██║ ╚████║╚██████╔╝██║
+╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝
 
-<p>
-<a href="https://soundcloud.com/hennupwood">
-Listen on SoundCloud
-</a>
-</p>
+</div>
+
+<div class="box">
+
+<div class="purple">
+══════════════════════════════════════════════════════════════
+</div>
+
+<div class="blue">
+CONNECT 33600
+</div>
+
+<br>
+
+<div>
+SYSTEM............. ONLINE
+</div>
+
+<div>
+NODE............... 01
+</div>
+
+<div>
+LOCATION........... HALSTEREN.NL
+</div>
+
+<div>
+ESTABLISHED........ 1995
+</div>
+
+<div>
+UPTIME............. 31 YEARS
+</div>
+
+<br>
+
+<div class="cyan">
+LOADING ATMOSPHERIC AUDIO SYSTEM...
+</div>
+
+<div class="cyan">
+LOADING ARCHIVES...
+</div>
+
+<div class="cyan">
+LOADING HENNUPWOOD...
+</div>
+
+<br>
+
+<div class="yellow">
+READY.
+</div>
+
+<div class="menu">
+
+[1] <a href="https://soundcloud.com/hennupwood">MUSIC</a><br>
+
+[2] ARCHIVES<br>
+
+[3] ABOUT<br>
+
+[4] CONTACT<br>
+
+</div>
+
+<div class="prompt">
+COMMAND > <span class="blink">█</span>
+</div>
+
+</div>
+
+<div class="footer">
+
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+
+</div>
+
+</div>
 
 </body>
 </html>
