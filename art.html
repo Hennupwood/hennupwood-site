@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hennupwood BBS - ANSI Art</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:225px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    border:2px solid #ff00ff;
+    margin-top:20px;
+    padding:20px;
+    box-shadow:0 0 20px #330033;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+/* --- gallery --- */
+
+.gallery{
+    margin-top:30px;
+}
+
+.art{
+    margin:0 0 45px 0;
+}
+
+.art img{
+    display:block;
+    max-width:100%;
+    width:560px;
+    height:auto;
+    border:1px solid #00ffff;
+    background:#000;
+    image-rendering:pixelated;          /* keep the blocky edges crisp */
+    box-shadow:0 0 14px #001a33;
+}
+
+.caption{
+    margin-top:10px;
+    line-height:1.7;
+    font-size:14px;
+}
+
+.caption .title{
+    color:#ff00ff;
+}
+
+.caption .meta{
+    color:#666;
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="Designer (4).png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="purple">
+══════════════════════════════════════════════════════════════
+</div>
+
+<div class="blue">
+ANSI ART ARCHIVE
+</div>
+
+<br>
+
+<div>CLASS............. ANSI / BLOCK ART</div>
+<div>ARTIST............ =SiKE=</div>
+<div>GROUP............. DALAMA / SPYCO</div>
+<div>ERA............... 1990s</div>
+
+<br>
+
+<div class="cyan">LOADING GFX.ANS...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="gallery">
+
+    <div class="art">
+        <img src="spyco-bbs.jpg" alt="SPYCO BBS login screen">
+        <div class="caption">
+            <span class="title">SPYCO BBS</span><br>
+            <span class="meta">login screen &middot; =SiKE= &middot; 199x</span>
+        </div>
+    </div>
+
+    <div class="art">
+        <img src="sike-menu.jpg" alt="SiKE menu screen with flames">
+        <div class="caption">
+            <span class="title">=SiKE= &mdash; MENU</span><br>
+            <span class="meta">main menu screen &middot; 199x</span>
+        </div>
+    </div>
+
+    <div class="art">
+        <img src="hell.jpg" alt="HELL logo">
+        <div class="caption">
+            <span class="title">HELL</span><br>
+            <span class="meta">logo &middot; =SiKE= &middot; 1998</span>
+        </div>
+    </div>
+
+    <div class="art">
+        <img src="time-warp.jpg" alt="TIME WARP logo">
+        <div class="caption">
+            <span class="title">TIME WARP</span><br>
+            <span class="meta">logo &middot; =SiKE= &middot; 199x</span>
+        </div>
+    </div>
+
+    <div class="art">
+        <img src="spyco.jpg" alt="SPYCO logo variant">
+        <div class="caption">
+            <span class="title">SPYCO</span><br>
+            <span class="meta">logo variant &middot; =SiKE= &middot; 199x</span>
+        </div>
+    </div>
+
+    <div class="art">
+        <img src="spyco-x.jpg" alt="SPYCO X">
+        <div class="caption">
+            <span class="title">SPYCO X</span><br>
+            <span class="meta">stipple / dither work &middot; =SiKE= &middot; 199x</span>
+        </div>
+    </div>
+
+</div>
+
+<div class="prompt">
+[0] <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND > <span class="blink">█</span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+</body>
+</html>
