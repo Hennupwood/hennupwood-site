@@ -23,11 +23,18 @@ body{
 }
 
 .logo{
-    color:#808080;
     text-align:center;
-    font-size:14px;
-    line-height:1.1;
-    white-space:pre;
+    margin-bottom:25px;
+}
+
+.logo img{
+    width:100%;
+    max-width:1000px;
+    height:auto;
+    filter:
+        drop-shadow(0 0 10px #0066ff)
+        drop-shadow(0 0 20px #0066ff)
+        drop-shadow(0 0 40px #00ffff);
 }
 
 .purple{
@@ -44,10 +51,6 @@ body{
 
 .yellow{
     color:#ffff00;
-}
-
-.gray{
-    color:#999;
 }
 
 .box{
@@ -80,8 +83,8 @@ a:hover{
     animation:blink 1s step-end infinite;
 }
 
-@keyframes blink {
-    50% {
+@keyframes blink{
+    50%{
         opacity:0;
     }
 }
@@ -101,14 +104,7 @@ a:hover{
 <div class="wrapper">
 
 <div class="logo">
-
-██╗  ██╗███████╗███╗   ██╗███╗   ██╗██╗   ██╗██████╗
-██║  ██║██╔════╝████╗  ██║████╗  ██║██║   ██║██╔══██╗
-███████║█████╗  ██╔██╗ ██║██╔██╗ ██║██║   ██║██████╔╝
-██╔══██║██╔══╝  ██║╚██╗██║██║╚██╗██║██║   ██║██╔═══╝
-██║  ██║███████╗██║ ╚████║██║ ╚████║╚██████╔╝██║
-╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝
-
+    <img src="Designer%20(4).png" alt="Hennupwood Logo">
 </div>
 
 <div class="box">
@@ -165,7 +161,7 @@ READY.
 
 <div class="menu">
 
-[1] <a href="https://soundcloud.com/hennupwoodmusic">MUSIC</a><br>
+[1] <a href="https://soundcloud.com/hennupwoodmusic" target="_blank">MUSIC</a><br>
 
 [2] ARCHIVES<br>
 
@@ -182,10 +178,8 @@ COMMAND > <span class="blink">█</span>
 </div>
 
 <div class="footer">
-
 HENNUPWOOD MUSIC BBS v1.0<br>
 Inspired by the ANSI / BBS scene.
-
 </div>
 
 </div>
