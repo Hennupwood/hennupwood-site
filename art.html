@@ -127,6 +127,58 @@ a:hover{
     border-image:url('frame-outer.png') 14 0 0 0 stretch;
     margin:0 0 16px 0;
 }
+
+/* --- click to enlarge --- */
+.art img{ cursor:zoom-in; }
+
+.viewer{
+    position:fixed;
+    inset:0;
+    z-index:500;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.92);
+    padding:20px;
+    box-sizing:border-box;
+}
+.viewer.open{ display:flex; }
+.viewer img{
+    max-width:92vw;
+    max-height:78vh;
+    width:auto;
+    height:auto;
+    image-rendering:pixelated;
+    border:12px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+    cursor:zoom-out;
+}
+.viewer .v-cap{
+    margin-top:16px;
+    text-align:center;
+    line-height:1.7;
+}
+.viewer .v-cap .title{ color:#ff00ff; }
+.viewer .v-cap .meta{ color:#666; }
+.viewer .v-nav{
+    margin-top:10px;
+    color:#00ffff;
+    font-size:13px;
+}
+.viewer .v-nav button{
+    font-family:"Courier New", monospace;
+    font-size:14px;
+    background:#000;
+    color:#00ffff;
+    border:1px solid #aa00aa;
+    padding:6px 12px;
+    margin:0 6px;
+    cursor:pointer;
+}
+.viewer .v-nav button:hover{ color:#ffff00; border-color:#ff00ff; }
 </style>
 </head>
 
@@ -211,6 +263,22 @@ ANSI ART ARCHIVE
         </div>
     </div>
 
+    <div class="art">
+        <img src="spyco-red.png" alt="SPYCO logo in red and grey">
+        <div class="caption">
+            <span class="title">SPYCO &mdash; RED</span><br>
+            <span class="meta">logo &middot; =SiKE= &middot; 199x</span>
+        </div>
+    </div>
+
+    <div class="art">
+        <img src="dalama-nation.png" alt="DALAMA - Nation Substance of Scenthethics">
+        <div class="caption">
+            <span class="title">DALAMA &mdash; NATION SUBSTANCE OF SCENTHETHICS</span><br>
+            <span class="meta">logo &middot; =SiKE= &middot; 199x</span>
+        </div>
+    </div>
+
 </div>
 
 <div class="term-out" id="termOut"></div>
@@ -227,6 +295,55 @@ Inspired by the ANSI / BBS scene.
 </div>
 
 </div>
+
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="ANSI art viewer">
+    <img id="vImg" src="" alt="">
+    <div class="v-cap" id="vCap"></div>
+    <div class="v-nav">
+        <button id="vPrev" aria-label="Previous">&lt; PREV</button>
+        <button id="vClose" aria-label="Close">CLOSE [ESC]</button>
+        <button id="vNext" aria-label="Next">NEXT &gt;</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    var items = Array.prototype.slice.call(document.querySelectorAll('.gallery .art'));
+    var viewer = document.getElementById('viewer');
+    var vImg = document.getElementById('vImg');
+    var vCap = document.getElementById('vCap');
+    var cur = 0;
+
+    function show(i){
+        cur = (i + items.length) % items.length;
+        var img = items[cur].querySelector('img');
+        var cap = items[cur].querySelector('.caption');
+        vImg.src = img.src;
+        vImg.alt = img.alt;
+        vCap.innerHTML = cap ? cap.innerHTML : '';
+        viewer.classList.add('open');
+    }
+    function close(){ viewer.classList.remove('open'); }
+
+    items.forEach(function(el, i){
+        el.querySelector('img').addEventListener('click', function(){ show(i); });
+    });
+    document.getElementById('vPrev').addEventListener('click', function(e){ e.stopPropagation(); show(cur - 1); });
+    document.getElementById('vNext').addEventListener('click', function(e){ e.stopPropagation(); show(cur + 1); });
+    document.getElementById('vClose').addEventListener('click', close);
+    vImg.addEventListener('click', close);
+    viewer.addEventListener('click', function(e){ if (e.target === viewer) close(); });
+
+    document.addEventListener('keydown', function(e){
+        if (!viewer.classList.contains('open')) return;
+        if (e.key === 'Escape'){ close(); }
+        else if (e.key === 'ArrowLeft'){ show(cur - 1); e.preventDefault(); }
+        else if (e.key === 'ArrowRight'){ show(cur + 1); e.preventDefault(); }
+        e.stopImmediatePropagation();
+    }, true);
+})();
+</script>
 
 <script src="bbs.js"></script>
 </body>
