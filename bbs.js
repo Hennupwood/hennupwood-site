@@ -95,6 +95,52 @@ document.head.appendChild(st);
     if (!still) requestAnimationFrame(loop);
 })();
 
+/* ---------- menu bar under the logo, sticks to the top ---------- */
+(function(){
+    var logo = document.querySelector('.logo');
+    if (!logo) return;
+    var items = [
+        ['MAIN', 'index.html', ['index']],
+        ['MUSIC', 'https://soundcloud.com/hennupwoodmusic', []],
+        ['ARCHIVES', 'archives.html', ['archives']],
+        ['ABOUT', 'about.html', ['about']],
+        ['ART', 'art.html', ['art']],
+        ['DOORS', 'games.html', ['games', 'raid', 'tower']],
+        ['BULLETINS', 'bulletins.html', ['bulletins']],
+        ['CONTACT', 'contact.html', ['contact']]
+    ];
+    var navCss = ''
+     + '.topnav{position:sticky;top:0;z-index:100;background:#000;margin:-10px -30px 0;padding:10px 30px;'
+     +   'border-bottom:2px solid #aa00aa;box-shadow:0 6px 16px -6px #8800aa;'
+     +   'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;font-size:15px;}'
+     + '.topnav a{color:#00ffff;padding:2px 4px;white-space:nowrap;}'
+     + '.topnav a .br{color:#ff00ff;}'
+     + '.topnav a:hover{color:#ffff00;}'
+     + '.topnav a.here{background:#0000aa;color:#fff;}'
+     + '.topnav a.here .br{color:#ffff00;}'
+     + '.bulletin{scroll-margin-top:80px !important;}'
+     + '@media (max-width:600px){.topnav{font-size:13px;gap:2px 10px;margin:-10px -16px 0;padding:8px 16px;}}';
+    var ns = document.createElement('style');
+    ns.textContent = navCss;
+    document.head.appendChild(ns);
+
+    var nav = document.createElement('nav');
+    nav.className = 'topnav';
+    nav.setAttribute('aria-label', 'Main menu');
+    items.forEach(function(it){
+        var a = document.createElement('a');
+        a.href = it[1];
+        if (/^https?:/.test(it[1])){ a.target = '_blank'; a.rel = 'noopener'; }
+        if (it[2].indexOf(page) !== -1){ a.className = 'here'; a.setAttribute('aria-current', 'page'); }
+        a.innerHTML = '<span class="br">[</span>' + it[0] + '<span class="br">]</span>';
+        nav.appendChild(a);
+    });
+    logo.parentNode.insertBefore(nav, logo.nextSibling);
+    logo.style.marginBottom = '0';
+    var box = document.querySelector('.box');
+    if (box) box.style.marginTop = '30px';
+})();
+
 /* ---------- build the prompt ---------- */
 var line = document.getElementById('cmdline');
 var out  = document.getElementById('termOut');
