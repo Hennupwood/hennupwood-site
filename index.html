@@ -116,7 +116,7 @@ a:hover{
 </style>
 </head>
 
-<body>
+<body data-page="index">
 
 <div class="wrapper">
 
@@ -169,8 +169,10 @@ READY.
 <span class="num">[6]</span> <a href="games.html">DOOR GAMES</a><br>
 </div>
 
+<div class="term-out" id="termOut"></div>
+
 <div class="prompt">
-COMMAND > <span class="blink">█</span>
+COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
 </div>
 
 </div>
@@ -182,5 +184,6 @@ Inspired by the ANSI / BBS scene.
 
 </div>
 
+<script src="bbs.js"></script>
 </body>
 </html>

@@ -173,7 +173,7 @@ canvas{
 </style>
 </head>
 
-<body>
+<body data-page="tower">
 
 <div class="wrapper">
 
@@ -226,8 +226,10 @@ DOOR 2 &mdash; THE SYSOP&rsquo;S TOWER
 
 </div>
 
+<div class="term-out" id="termOut"></div>
+
 <div class="prompt">
-<span class="purple">[0]</span> <a href="games.html">BACK TO DOORS</a> &nbsp; COMMAND > <span class="blink">█</span>
+<span class="purple">[0]</span> <a href="games.html">BACK TO DOORS</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
 </div>
 
 </div>
@@ -771,5 +773,6 @@ requestAnimationFrame(loop);
 
 </script>
 
+<script src="bbs.js"></script>
 </body>
 </html>

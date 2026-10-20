@@ -161,7 +161,7 @@ canvas{
 </style>
 </head>
 
-<body>
+<body data-page="raid">
 
 <div class="wrapper">
 
@@ -210,8 +210,10 @@ DOOR 1 &mdash; SPYCO SPACE RAID
 
 </div>
 
+<div class="term-out" id="termOut"></div>
+
 <div class="prompt">
-<span class="purple">[0]</span> <a href="games.html">BACK TO DOORS</a> &nbsp; COMMAND > <span class="blink">█</span>
+<span class="purple">[0]</span> <a href="games.html">BACK TO DOORS</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
 </div>
 
 </div>
@@ -675,5 +677,6 @@ requestAnimationFrame(loop);
 })();
 </script>
 
+<script src="bbs.js"></script>
 </body>
 </html>
