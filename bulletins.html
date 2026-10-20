@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hennupwood BBS door games — play SPYCO SPACE RAID, a retro arcade shooter in the spirit of the 90s BBS scene.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>Bulletins — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.blist{ margin-top:24px; line-height:2; }
+.blist .num{ color:#ff00ff; }
+.blist .date{ color:#666; }
+
+.bulletin{ margin-top:40px; scroll-margin-top:20px; }
+.bulletin .b-head{ color:#ffff00; letter-spacing:1px; }
+.bulletin .b-date{ color:#666; font-size:13px; margin-bottom:10px; }
+.bulletin .b-body{ max-width:720px; line-height:1.8; }
+.bulletin .b-body .accent{ color:#ff00ff; }
+.bulletin:target .b-head{ color:#00ffff; }
+
+</style>
+</head>
+
+<body data-page="bulletins">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+BULLETINS
+</div>
+
+<br>
+
+<div>BULLETINS......... 4</div>
+<div>LAST UPDATE....... 20-10-2026</div>
+
+<br>
+
+<div class="cyan">LOADING BULLETINS...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="blist">
+<span class="num">[1]</span> <a href="#b1">NEW DOORS OPENED</a> <span class="date">&nbsp;&middot; 20-10-2026</span><br>
+<span class="num">[2]</span> <a href="#b2">ANSI ART ARCHIVE UPDATED</a> <span class="date">&nbsp;&middot; 20-10-2026</span><br>
+<span class="num">[3]</span> <a href="#b3">NEW RELEASES 2026</a> <span class="date">&nbsp;&middot; 2026</span><br>
+<span class="num">[4]</span> <a href="#b4">THE BOARD IS BACK</a> <span class="date">&nbsp;&middot; 2026</span><br>
+</div>
+
+<!--
+  NEW BULLETIN?
+  1. Copy one <div class="bulletin"> block below and paste it at the top.
+  2. Give it the next number (id="b5", BULLETIN #5).
+  3. Add a line for it to the list above.
+-->
+
+<div class="bulletin" id="b1">
+    <div class="ansi-line"></div>
+    <div class="b-head">BULLETIN #1 &mdash; NEW DOORS OPENED</div>
+    <div class="b-date">POSTED 20-10-2026 BY THE SYSOP</div>
+    <div class="b-body">
+        Two door games are now online. <span class="accent">SPYCO SPACE RAID</span> is an arcade
+        shooter: clear the waves and watch out for the divers. <span class="accent">THE SYSOP&rsquo;S TOWER</span>
+        is a puzzle adventure: climb five rooms to the sysop terminal.
+        Press 6 in the main menu or type DOORS.
+    </div>
+</div>
+
+<div class="bulletin" id="b2">
+    <div class="ansi-line"></div>
+    <div class="b-head">BULLETIN #2 &mdash; ANSI ART ARCHIVE UPDATED</div>
+    <div class="b-date">POSTED 20-10-2026 BY THE SYSOP</div>
+    <div class="b-body">
+        Two pieces from the old days were found and added: <span class="accent">SPYCO &mdash; RED</span> and
+        <span class="accent">DALAMA &mdash; NATION SUBSTANCE OF SCENTHETHICS</span>.
+        Click any piece in the archive to see it full size. More will follow once the old disks are dug up.
+    </div>
+</div>
+
+<div class="bulletin" id="b3">
+    <div class="ansi-line"></div>
+    <div class="b-head">BULLETIN #3 &mdash; NEW RELEASES 2026</div>
+    <div class="b-date">POSTED 2026 BY THE SYSOP</div>
+    <div class="b-body">
+        Fresh this year: <span class="accent">Bad Monday &mdash; New Years Evening</span>,
+        <span class="accent">I Look Like A Junk</span>, <span class="accent">About My Life</span>
+        (plus a vocal version), <span class="accent">Reggae Dub &mdash; Dub Special</span>,
+        <span class="accent">Phase Techno</span> and more. Artwork is in the ARCHIVES,
+        the music is on <a href="https://soundcloud.com/hennupwoodmusic" target="_blank" rel="noopener">SoundCloud</a>.
+    </div>
+</div>
+
+<div class="bulletin" id="b4">
+    <div class="ansi-line"></div>
+    <div class="b-head">BULLETIN #4 &mdash; THE BOARD IS BACK</div>
+    <div class="b-date">POSTED 2026 BY THE SYSOP</div>
+    <div class="b-body">
+        In the nineties this was <span class="accent">SPYCO BBS</span>: dial-up modems, ANSI screens and tracker music.
+        Now the board is back as <span class="accent">HENNUPWOOD MUSIC BBS</span>, with the music, the archives
+        and the old ANSI work together in one place. Thanks for calling.
+    </div>
+</div>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<script src="bbs.js"></script>
+</body>
+</html>

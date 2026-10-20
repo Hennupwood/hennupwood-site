@@ -5,7 +5,7 @@
 /* ---------- where things live ---------- */
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
-    games:'games.html', raid:'raid.html', tower:'tower.html',
+    games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html',
     music:'https://soundcloud.com/hennupwoodmusic',
     soundcloud:'https://soundcloud.com/hennupwoodmusic',
     mixcloud:'https://www.mixcloud.com/ronald-van-toledo/',
@@ -15,7 +15,8 @@ var LINKS = {
 
 /* number keys per page, matching the menus on each page */
 var NUMS = {
-    index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games' },
+    index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins' },
+    bulletins:{ '1':'#b1', '2':'#b2', '3':'#b3', '4':'#b4', '0':'main' },
     about:    { '1':'soundcloud', '2':'mixcloud', '3':'youtube', '4':'facebook', '0':'main' },
     archives: { '0':'main' },
     art:      { '0':'main' },
@@ -158,6 +159,7 @@ function next(){
 }
 
 function go(where){
+    if (where.charAt(0) === '#'){ print('READING BULLETIN ' + where.slice(2) + '...', 'l-bl'); window.location.hash = where; return; }
     if (where === 'contact'){ print('MAILBOX UNDER CONSTRUCTION. TRY AGAIN SOON.', 'l-pk'); return; }
     var url = LINKS[where];
     if (!url) return;
@@ -219,6 +221,7 @@ function run(raw){
             '  ABOUT         sysop profile',
             '  ART           ANSI art archive',
             '  DOORS         door games',
+            '  BULLETINS     news from the sysop',
             '  WHO           who is online',
             '  TIME          system time',
             '  VER           system version',
@@ -238,6 +241,7 @@ function run(raw){
     case 'ABOUT': case 'INFO': case 'I': go('about'); return;
     case 'ART': case 'ANSI': case 'GFX': go('art'); return;
     case 'DOORS': case 'DOOR': case 'GAMES': case 'D': go('games'); return;
+    case 'BULLETINS': case 'BULLETIN': case 'NEWS': case 'B': go('bulletins'); return;
     case 'RAID': go('raid'); return;
     case 'TOWER': go('tower'); return;
     case 'CONTACT': case 'MAIL': case 'E': go('contact'); return;
