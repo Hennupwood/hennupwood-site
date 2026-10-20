@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hennupwood BBS door games — play SPYCO SPACE RAID, a retro arcade shooter in the spirit of the 90s BBS scene.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>The Sysop&rsquo;s Tower — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.touch.dpad{
+    display:none;
+    margin-top:14px;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    max-width:360px;
+}
+@media (hover:none) and (pointer:coarse){
+    .touch.dpad{ display:grid; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+DOOR 2 &mdash; THE SYSOP&rsquo;S TOWER
+</div>
+
+<br>
+
+<div>TYPE.............. ISOMETRIC PUZZLE ADVENTURE</div>
+<div>ROOMS............. 5</div>
+<div>TIME LEFT......... UNLIMITED</div>
+
+<br>
+
+<div class="cyan">OPENING DOOR...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="game" id="tower">
+
+    <div class="screen">
+        <canvas id="cv" width="320" height="240" aria-label="The Sysop's Tower game"></canvas>
+    </div>
+
+    <div class="touch dpad">
+        <button id="tUp" aria-label="Up">&#8598;</button>
+        <button id="tJump" class="fire" aria-label="Jump">JUMP</button>
+        <button id="tRight" aria-label="Right">&#8599;</button>
+        <button id="tLeft" aria-label="Left">&#8601;</button>
+        <span></span>
+        <button id="tDown" aria-label="Down">&#8600;</button>
+    </div>
+
+    <div class="help">
+        <span class="desktop"><span class="key">&uarr; &rarr; &darr; &larr;</span> walk (see the compass in the corner) &nbsp; <span class="key">SPACE</span> jump<br>
+        <span class="key">R</span> restart room &nbsp; <span class="key">P</span> pause &nbsp; <span class="key">M</span> sound on/off<br></span>
+        Jump up one level, or leap over a gap or spikes. Push blocks to build a way up &mdash; a block pushed into a pit fills it.
+    </div>
+
+</div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="games.html">BACK TO DOORS</a> &nbsp; COMMAND > <span class="blink">█</span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<script>
+(function(){
+
+var cv = document.getElementById('cv');
+var g  = cv.getContext('2d');
+var W = 320, H = 240;
+var OX = 160, OY = 74, HU = 10;
+var WALL = 99, PIT = -9;
+
+/* ---------- rooms ----------
+   h: '#' wall, ' ' pit, '0'-'3' floor height
+   o: S start, B block, K key, D door, E exit, ^ spikes, x spark (moves along x), y spark (moves along y)
+*/
+var ROOMS = [
+  { name:'THE LOBBY',
+    h:["########","#000000#","#000000#","#000000#","#000000#","######0#","#000000#","########"],
+    o:["........",".S......","........","...K....","........","......D.",".....E..","........"] },
+  { name:'UPLOAD STAIRS',
+    h:["########","#000 00#","#000 00#","#000 01#","#000 12#","#000 22#","#000 22#","########"],
+    o:["........",".S......","........","........","........","........","......E.","........"] },
+  { name:'BLOCK TRANSFER',
+    h:["########","#000000#","#000000#","#      #","#      #","#000000#","#000022#","########"],
+    o:["........","...S....","...B....","........","........","........","..B...E.","........"] },
+  { name:'SPARK ALLEY',
+    h:["########","#000000#","#000000#","#000000#","#000000#","#0000#0#","#0000#0#","########"],
+    o:["........",".S..^...","...x....",".^......","....K.y.","..^...D.","......E.","........"] },
+  { name:'SYSOP TERMINAL',
+    h:["########","#000002#","#000000#","#00  00#","#00  00#","#00000##","#000000#","########"],
+    o:["........",".S....K.","....B...","........","........","..x.....",".....DE.","........"] }
+];
+
+/* ---------- ANSI palette ---------- */
+var C = {
+  k:'#000000', b:'#0000aa', B:'#5555ff', c:'#00aaaa', CC:'#55ffff',
+  m:'#aa00aa', M:'#ff55ff', r:'#aa0000', R:'#ff5555', y:'#aa5500',
+  Y:'#ffff55', w:'#aaaaaa', W:'#ffffff', d:'#555555'
+};
+var TOPS  = ['#0000aa', '#aa00aa', '#00aaaa', '#aa5500'];
+var LEFTS = ['#000066', '#660066', '#006666', '#663300'];
+var RIGHT = ['#000088', '#880088', '#008888', '#884400'];
+
+/* ---------- sound ---------- */
+var AC = null, soundOn = true;
+function beep(f, d, type, vol){
+  if (!soundOn) return;
+  try{
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    var o = AC.createOscillator(), v = AC.createGain();
+    o.type = type || 'square'; o.frequency.value = f; v.gain.value = vol || 0.04;
+    o.connect(v); v.connect(AC.destination);
+    var t = AC.currentTime;
+    v.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.start(t); o.stop(t + d);
+  }catch(e){}
+}
+
+/* ---------- state ---------- */
+var state = 'title';            // title | intro | play | dying | over | win
+var roomIdx, hgt, blocks, keysMap, doors, spikes, exitCell, sparks;
+var player, keysHeld, lives, deaths, timer, stateT, tick = 0, facing = 0, paused = false;
+var held = {};
+
+var DIRS = [ {dx:-1,dy:0}, {dx:0,dy:-1}, {dx:1,dy:0}, {dx:0,dy:1} ]; // up, right, down, left
+
+function k(x, y){ return x + ',' + y; }
+function inb(x, y){ return x >= 0 && y >= 0 && x < 8 && y < 8; }
+
+function loadRoom(i){
+  var R = ROOMS[i];
+  hgt = []; blocks = {}; keysMap = {}; doors = {}; spikes = {}; exitCell = null; sparks = [];
+  for (var y = 0; y < 8; y++){
+    hgt.push([]);
+    for (var x = 0; x < 8; x++){
+      var hc = R.h[y][x], oc = R.o[y][x];
+      hgt[y].push(hc === '#' ? WALL : (hc === ' ' ? PIT : parseInt(hc, 10)));
+      if (oc === 'S') player = { x:x, y:y, fx:x, fy:y, fh:0, t:1, dur:1, arc:0 };
+      if (oc === 'B') blocks[k(x,y)] = true;
+      if (oc === 'K') keysMap[k(x,y)] = true;
+      if (oc === 'D') doors[k(x,y)] = true;
+      if (oc === '^') spikes[k(x,y)] = true;
+      if (oc === 'E') exitCell = { x:x, y:y };
+      if (oc === 'x') sparks.push({ x:x, y:y, dx:1, dy:0, fx:x, fy:y });
+      if (oc === 'y') sparks.push({ x:x, y:y, dx:0, dy:1, fx:x, fy:y });
+    }
+  }
+  player.fh = floorH(player.x, player.y);
+  keysHeld = 0;
+  state = 'intro'; stateT = 70;
+}
+
+function floorH(x, y){ return inb(x, y) ? hgt[y][x] : WALL; }
+function standH(x, y){
+  if (!inb(x, y)) return WALL;
+  var f = hgt[y][x];
+  if (f === WALL) return WALL;
+  if (doors[k(x,y)]) return WALL;
+  if (f === PIT) return PIT;
+  return f + (blocks[k(x,y)] ? 1 : 0);
+}
+function playerH(){ return standH(player.x, player.y); }
+function busy(){ return player.t < 1; }
+
+/* ---------- moves ---------- */
+function startMove(nx, ny, dur, arc){
+  player.fx = player.x; player.fy = player.y; player.fh = playerH();
+  player.x = nx; player.y = ny;
+  player.t = 0; player.dur = dur; player.arc = arc;
+}
+
+function bump(){
+  player.fx = player.x; player.fy = player.y; player.fh = playerH();
+  player.t = 0; player.dur = 10; player.arc = 6;
+  beep(120, 0.06, 'square', 0.03);
+}
+
+function tryWalk(d){
+  var D = DIRS[d], ph = playerH();
+  var tx = player.x + D.dx, ty = player.y + D.dy;
+  if (!inb(tx, ty)) return;
+
+  if (doors[k(tx,ty)]){
+    if (keysHeld > 0 && floorH(tx, ty) <= ph){
+      keysHeld--; delete doors[k(tx,ty)];
+      beep(520, 0.08); setTimeout(function(){ beep(780, 0.12); }, 80);
+    } else {
+      beep(90, 0.12, 'sawtooth', 0.03);
+    }
+    return;
+  }
+
+  if (blocks[k(tx,ty)] && floorH(tx, ty) === ph){
+    var bx = tx + D.dx, by = ty + D.dy;
+    var bf = floorH(bx, by);
+    var free = inb(bx, by) && bf !== WALL && !blocks[k(bx,by)] && !doors[k(bx,by)] &&
+               !keysMap[k(bx,by)] && !spikes[k(bx,by)] &&
+               !(exitCell && exitCell.x === bx && exitCell.y === by) && !sparkAt(bx, by);
+    if (free && (bf === floorH(tx, ty) || bf === PIT)){
+      delete blocks[k(tx,ty)];
+      if (bf === PIT){ hgt[by][bx] = floorH(tx, ty); beep(140, 0.25, 'triangle', 0.05); }
+      else { blocks[k(bx,by)] = true; beep(200, 0.06, 'triangle', 0.04); }
+      startMove(tx, ty, 10, 0);
+      return;
+    }
+    bump(); return;
+  }
+
+  var sh = standH(tx, ty);
+  if (sh === WALL) { bump(); return; }
+  if (sh === PIT || sh <= ph){ startMove(tx, ty, 9, 0); return; }
+  bump();
+}
+
+function tryJump(d){
+  var D = DIRS[d], ph = playerH();
+  var tx = player.x + D.dx, ty = player.y + D.dy;
+  var sh = standH(tx, ty);
+  beep(600, 0.08, 'square', 0.03);
+
+  if (inb(tx, ty) && (sh === PIT || spikes[k(tx,ty)] || sh < ph)){
+    var t2x = tx + D.dx, t2y = ty + D.dy, s2 = standH(t2x, t2y);
+    if (inb(t2x, t2y) && s2 !== WALL && s2 !== PIT && s2 <= ph){
+      startMove(t2x, t2y, 18, 14); return;
+    }
+  }
+  if (inb(tx, ty) && sh !== WALL && sh <= ph + 1){
+    startMove(tx, ty, 14, 12); return;
+  }
+  player.fx = player.x; player.fy = player.y; player.fh = ph;
+  player.t = 0; player.dur = 14; player.arc = 12;
+}
+
+function sparkAt(x, y){
+  for (var i = 0; i < sparks.length; i++) if (sparks[i].x === x && sparks[i].y === y) return true;
+  return false;
+}
+
+function onLand(){
+  var x = player.x, y = player.y, key = k(x, y);
+  if (floorH(x, y) === PIT){ die('fall'); return; }
+  if (spikes[key] && playerH() === floorH(x, y)){ die(); return; }
+  if (keysMap[key]){
+    delete keysMap[key]; keysHeld++;
+    beep(990, 0.08); setTimeout(function(){ beep(1320, 0.1); }, 70);
+  }
+  if (sparkAt(x, y) && playerH() === floorH(x, y)){ die(); return; }
+  if (exitCell && exitCell.x === x && exitCell.y === y){
+    beep(660, 0.1); setTimeout(function(){ beep(880, 0.1); }, 100); setTimeout(function(){ beep(1100, 0.15); }, 200);
+    roomIdx++;
+    if (roomIdx >= ROOMS.length){ state = 'win'; stateT = 0; }
+    else loadRoom(roomIdx);
+  }
+}
+
+var deathKind = '';
+function die(kind){
+  if (state !== 'play') return;
+  deathKind = kind || '';
+  lives--; deaths++;
+  beep(70, 0.5, 'sawtooth', 0.06);
+  state = 'dying'; stateT = 60;
+}
+
+function newGame(){
+  lives = 5; deaths = 0; timer = 0; roomIdx = 0;
+  loadRoom(0);
+}
+
+/* ---------- update ---------- */
+function update(){
+  tick++;
+
+  if (state === 'intro'){ if (--stateT <= 0) state = 'play'; }
+
+  if (state === 'dying'){
+    if (--stateT <= 0){
+      if (lives <= 0){ state = 'over'; beep(110, 0.6, 'sawtooth', 0.05); }
+      else loadRoom(roomIdx);
+    }
+  }
+
+  if (state === 'win') stateT++;
+
+  if (state !== 'play' && state !== 'intro') return;
+  timer++;
+
+  if (player.t < 1){
+    player.t = Math.min(1, player.t + 1 / player.dur);
+    if (player.t >= 1 && state === 'play') onLand();
+  } else if (state === 'play'){
+    var d = -1;
+    if (held.up) d = 0; else if (held.right) d = 1; else if (held.down) d = 2; else if (held.left) d = 3;
+    if (d >= 0){ facing = d; tryWalk(d); }
+  }
+
+  if (state === 'play' && tick % 16 === 0){
+    for (var i = 0; i < sparks.length; i++){
+      var s = sparks[i];
+      s.fx = s.x; s.fy = s.y;
+      for (var tries = 0; tries < 2; tries++){
+        var nx = s.x + s.dx, ny = s.y + s.dy;
+        if (inb(nx, ny) && standH(nx, ny) === 0 && floorH(nx, ny) === 0 &&
+            !(exitCell && exitCell.x === nx && exitCell.y === ny) && !doors[k(nx,ny)]){
+          s.x = nx; s.y = ny; break;
+        }
+        s.dx = -s.dx; s.dy = -s.dy;
+      }
+      if (s.x === player.x && s.y === player.y && playerH() === 0) die();
+    }
+  }
+}
+
+/* ---------- drawing ---------- */
+function scr(x, y, h){ return { x: OX + (x - y) * 16, y: OY + (x + y) * 8 - h * HU }; }
+
+function poly(pts, fill, stroke){
+  g.beginPath();
+  g.moveTo(pts[0], pts[1]);
+  for (var i = 2; i < pts.length; i += 2) g.lineTo(pts[i], pts[i+1]);
+  g.closePath();
+  g.fillStyle = fill; g.fill();
+  if (stroke){ g.strokeStyle = stroke; g.lineWidth = 1; g.stroke(); }
+}
+
+function column(x, y, top, base, cTop, cL, cR){
+  var s = scr(x, y, top), b = scr(x, y, base);
+  poly([s.x-16, s.y+8, s.x, s.y+16, b.x, b.y+16, b.x-16, b.y+8], cL, '#000');
+  poly([s.x+16, s.y+8, s.x, s.y+16, b.x, b.y+16, b.x+16, b.y+8], cR, '#000');
+  poly([s.x, s.y, s.x+16, s.y+8, s.x, s.y+16, s.x-16, s.y+8], cTop, '#000');
+}
+
+function txt(s, x, y, col, size, align){
+  g.font = 'bold ' + (size || 8) + 'px "Courier New", monospace';
+  g.fillStyle = col || C.W; g.textAlign = align || 'left'; g.textBaseline = 'top';
+  g.fillText(s, x, y);
+}
+
+function drawCell(x, y){
+  var f = hgt[y][x], key = k(x, y);
+  if (f === WALL){
+    if (x === 7 || y === 7) return;            // front walls stay open so you can see in
+    var wh = (x === 0 || y === 0) ? 2.4 : 1.3;
+    column(x, y, wh, -0.6, '#555555', '#2a2a2a', '#3a3a3a');
+    return;
+  }
+  if (f === PIT) return;
+
+  var ci = Math.max(0, Math.min(3, f));
+  column(x, y, f, -0.6, TOPS[ci], LEFTS[ci], RIGHT[ci]);
+  var s = scr(x, y, f);
+
+  if (exitCell && exitCell.x === x && exitCell.y === y){
+    var pulse = (Math.floor(tick / 8) % 2) ? C.M : C.CC;
+    poly([s.x, s.y+3, s.x+10, s.y+8, s.x, s.y+13, s.x-10, s.y+8], pulse);
+    poly([s.x, s.y+6, s.x+5, s.y+8, s.x, s.y+10, s.x-5, s.y+8], C.W);
+  }
+
+  if (spikes[key]){
+    g.fillStyle = C.W;
+    var pts = [[-6,8],[0,5],[6,8],[0,11]];
+    for (var i = 0; i < pts.length; i++){
+      var px = s.x + pts[i][0], py = s.y + pts[i][1];
+      poly([px-2, py+1, px, py-5, px+2, py+1], (i % 2) ? C.w : C.W);
+    }
+  }
+
+  if (blocks[key]) column(x, y, f + 1, f, '#aaaaaa', '#555555', '#777777');
+
+  if (doors[key]){
+    column(x, y, f + 1.6, f, '#ffff55', '#aa5500', '#884400');
+    var d = scr(x, y, f);
+    g.fillStyle = '#000';
+    g.fillRect(d.x - 9, d.y + 2, 2, 4);
+  }
+
+  if (keysMap[key]){
+    var bob = Math.sin(tick / 10) * 2;
+    var kp = scr(x, y, f + 0.9);
+    var kx = kp.x, ky = kp.y + 4 + bob;
+    g.fillStyle = C.Y;
+    g.fillRect(kx - 3, ky, 5, 5);
+    g.fillStyle = '#000'; g.fillRect(kx - 2, ky + 1, 3, 3);
+    g.fillStyle = C.Y;
+    g.fillRect(kx - 1, ky + 5, 2, 6);
+    g.fillRect(kx + 1, ky + 8, 2, 1);
+    g.fillRect(kx + 1, ky + 10, 2, 1);
+  }
+}
+
+function drawSpark(s){
+  var t = Math.min(1, (tick % 16) / 6);
+  var x = s.fx + (s.x - s.fx) * t, y = s.fy + (s.y - s.fy) * t;
+  var p = scr(x, y, 0.6);
+  var cx = p.x, cy = p.y + 6;
+  g.fillStyle = C.W; g.fillRect(cx - 1, cy - 1, 3, 3);
+  var cols = [C.CC, C.Y, C.M];
+  for (var i = 0; i < 7; i++){
+    g.fillStyle = cols[(i + tick) % 3];
+    g.fillRect(cx + ((Math.random() * 11) | 0) - 5, cy + ((Math.random() * 9) | 0) - 4, 1, 1);
+  }
+}
+
+function drawPlayer(){
+  var t = player.t;
+  var h1 = playerH(), h0 = player.fh;
+  var x = player.fx + (player.x - player.fx) * t;
+  var y = player.fy + (player.y - player.fy) * t;
+  var h = h0 + (h1 - h0) * t;
+  var lift = Math.sin(Math.PI * t) * player.arc;
+  if (state === 'dying' && deathKind === 'fall') h -= (60 - stateT) * 0.15;
+  var p = scr(x, y, h);
+  var fx = p.x, fy = p.y + 8 - lift;
+
+  if (state === 'dying' && Math.floor(stateT / 4) % 2) return;
+
+  /* shadow */
+  if (lift > 1 && floorH(player.x, player.y) !== PIT){
+    var sp = scr(x, y, h);
+    g.fillStyle = 'rgba(0,0,0,0.6)';
+    g.fillRect(sp.x - 4, sp.y + 7, 8, 2);
+  }
+
+  /* little modem robot */
+  g.fillStyle = C.c;   g.fillRect(fx - 4, fy - 9, 8, 8);     // body
+  g.fillStyle = C.CC;  g.fillRect(fx - 4, fy - 9, 8, 2);
+  g.fillStyle = C.Y;   g.fillRect(fx - 2, fy - 6, 1, 1);     // status leds
+  g.fillStyle = (tick % 20 < 10) ? C.R : C.r; g.fillRect(fx, fy - 6, 1, 1);
+  g.fillStyle = C.G || '#55ff55'; g.fillRect(fx + 2, fy - 6, 1, 1);
+  g.fillStyle = C.w;   g.fillRect(fx - 3, fy - 15, 6, 6);    // head
+  g.fillStyle = '#000';
+  var eye = (facing === 1 || facing === 2) ? 1 : -1;
+  g.fillRect(fx - 2 + eye, fy - 13, 1, 2);
+  g.fillRect(fx + 1 + eye, fy - 13, 1, 2);
+  g.fillStyle = C.M;   g.fillRect(fx, fy - 19, 1, 4);        // antenna
+  g.fillStyle = (tick % 30 < 15) ? C.M : C.W; g.fillRect(fx - 1, fy - 20, 3, 2);
+  g.fillStyle = C.d;   g.fillRect(fx - 4, fy - 1, 3, 1); g.fillRect(fx + 1, fy - 1, 3, 1); // feet
+}
+
+function drawCompass(){
+  var cx = 292, cy = 214;
+  poly([cx, cy-10, cx+18, cy, cx, cy+10, cx-18, cy], '#000', C.b);
+  txt('\u2191', cx - 15, cy - 15, C.Y, 9);
+  txt('\u2192', cx + 7,  cy - 15, C.Y, 9);
+  txt('\u2193', cx + 7,  cy + 4,  C.Y, 9);
+  txt('\u2190', cx - 15, cy + 4,  C.Y, 9);
+}
+
+function drawRoom(){
+  var pk = (player.fx + player.fy > player.x + player.y) ? { x:player.fx, y:player.fy } : { x:player.x, y:player.y };
+  for (var s = 0; s <= 14; s++){
+    for (var x = 0; x < 8; x++){
+      var y = s - x;
+      if (y < 0 || y > 7) continue;
+      drawCell(x, y);
+      for (var i = 0; i < sparks.length; i++) if (sparks[i].x === x && sparks[i].y === y) drawSpark(sparks[i]);
+      if (pk.x === x && pk.y === y) drawPlayer();
+    }
+  }
+}
+
+function fmtTime(fr){
+  var sec = Math.floor(fr / 60), m = Math.floor(sec / 60);
+  sec = sec % 60;
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function draw(){
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+
+  if (state === 'title'){
+    txt("THE SYSOP'S", W/2, 34, C.CC, 16, 'center');
+    txt('TOWER', W/2, 54, C.M, 30, 'center');
+    /* little preview tile + robot */
+    column(3.5, 3.5, 0, -0.6, TOPS[0], LEFTS[0], RIGHT[0]);
+    drawPlayerAt(3.5, 3.5);
+    if (Math.floor(tick / 30) % 2 === 0) txt('PRESS JUMP TO CONNECT', W/2, 168, C.Y, 10, 'center');
+    txt('FIND THE KEYS. PUSH THE BLOCKS.', W/2, 190, C.w, 8, 'center');
+    txt('REACH THE SYSOP TERMINAL.', W/2, 202, C.w, 8, 'center');
+    txt('A HENNUPWOOD BBS DOOR', W/2, 224, C.b, 8, 'center');
+    return;
+  }
+
+  if (state === 'win'){
+    txt('ACCESS GRANTED', W/2, 70, C.Y, 20, 'center');
+    txt('WELCOME, SYSOP.', W/2, 100, C.CC, 12, 'center');
+    txt('TIME ' + fmtTime(timer) + '   DEATHS ' + deaths, W/2, 130, C.w, 9, 'center');
+    if (Math.floor(tick / 30) % 2 === 0) txt('PRESS JUMP TO LOG ON AGAIN', W/2, 170, C.M, 9, 'center');
+    tick++;
+    return;
+  }
+
+  drawRoom();
+
+  txt('ROOM ' + (roomIdx + 1) + '/' + ROOMS.length + '  ' + ROOMS[roomIdx].name, 4, 3, C.CC, 8);
+  txt('LIVES ' + Math.max(0, lives), W - 4, 3, C.R, 8, 'right');
+  txt('KEYS ' + keysHeld, W - 4, 14, C.Y, 8, 'right');
+  txt(fmtTime(timer), 4, 14, C.w, 8);
+  drawCompass();
+
+  if (state === 'intro'){
+    g.fillStyle = 'rgba(0,0,0,0.7)'; g.fillRect(0, 96, W, 40);
+    txt(ROOMS[roomIdx].name, W/2, 106, C.Y, 14, 'center');
+  }
+  if (paused) txt('PAUSED', W/2, 110, C.Y, 14, 'center');
+  if (state === 'over'){
+    g.fillStyle = 'rgba(0,0,0,0.75)'; g.fillRect(0, 80, W, 80);
+    txt('NO CARRIER', W/2, 92, C.R, 22, 'center');
+    if (Math.floor(tick / 30) % 2 === 0) txt('PRESS JUMP TO REDIAL', W/2, 130, C.Y, 10, 'center');
+  }
+}
+
+function drawPlayerAt(x, y){
+  var p = scr(x, y, 0);
+  var fx = p.x, fy = p.y + 8;
+  g.fillStyle = C.c;   g.fillRect(fx - 4, fy - 9, 8, 8);
+  g.fillStyle = C.CC;  g.fillRect(fx - 4, fy - 9, 8, 2);
+  g.fillStyle = C.Y;   g.fillRect(fx - 2, fy - 6, 1, 1);
+  g.fillStyle = (tick % 20 < 10) ? C.R : C.r; g.fillRect(fx, fy - 6, 1, 1);
+  g.fillStyle = C.w;   g.fillRect(fx - 3, fy - 15, 6, 6);
+  g.fillStyle = '#000'; g.fillRect(fx - 1, fy - 13, 1, 2); g.fillRect(fx + 2, fy - 13, 1, 2);
+  g.fillStyle = C.M;   g.fillRect(fx, fy - 19, 1, 4);
+  g.fillStyle = (tick % 30 < 15) ? C.M : C.W; g.fillRect(fx - 1, fy - 20, 3, 2);
+}
+
+/* ---------- loop ---------- */
+var last = 0, acc = 0, STEP = 1000 / 60;
+function loop(t){
+  if (!last) last = t;
+  acc += Math.min(100, t - last); last = t;
+  while (acc >= STEP){
+    if (!paused) update();
+    else tick++;
+    acc -= STEP;
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* ---------- input ---------- */
+function jumpPressed(){
+  if (state === 'title' || state === 'over' || state === 'win'){
+    newGame(); beep(440, 0.1); setTimeout(function(){ beep(660, 0.1); }, 100);
+    return;
+  }
+  if (state === 'play' && !busy() && !paused){
+    var d = facing;
+    if (held.up) d = 0; else if (held.right) d = 1; else if (held.down) d = 2; else if (held.left) d = 3;
+    facing = d;
+    tryJump(d);
+  }
+}
+
+var KEYMAP = { ArrowUp:'up', ArrowRight:'right', ArrowDown:'down', ArrowLeft:'left',
+               w:'up', d:'right', s:'down', a:'left', W:'up', D:'right', S:'down', A:'left' };
+
+document.addEventListener('keydown', function(e){
+  if ((KEYMAP[e.key] || e.key === ' ') && onScreen()) e.preventDefault();
+  if (KEYMAP[e.key]) held[KEYMAP[e.key]] = true;
+  if (e.key === ' ' && !e.repeat) jumpPressed();
+  if ((e.key === 'r' || e.key === 'R') && state === 'play'){ loadRoom(roomIdx); }
+  if ((e.key === 'p' || e.key === 'P') && (state === 'play' || state === 'intro')) paused = !paused;
+  if (e.key === 'm' || e.key === 'M') soundOn = !soundOn;
+});
+document.addEventListener('keyup', function(e){
+  if (KEYMAP[e.key]) held[KEYMAP[e.key]] = false;
+});
+
+function onScreen(){
+  var r = cv.getBoundingClientRect();
+  return r.bottom > 0 && r.top < window.innerHeight;
+}
+
+function holdBtn(id, dir){
+  var el = document.getElementById(id);
+  if (!el) return;
+  var on = function(e){ e.preventDefault(); if (dir === 'jump') jumpPressed(); else held[dir] = true; };
+  var off = function(e){ e.preventDefault(); if (dir !== 'jump') held[dir] = false; };
+  el.addEventListener('pointerdown', on);
+  el.addEventListener('pointerup', off);
+  el.addEventListener('pointerleave', off);
+  el.addEventListener('pointercancel', off);
+}
+holdBtn('tUp', 'up'); holdBtn('tRight', 'right'); holdBtn('tDown', 'down'); holdBtn('tLeft', 'left');
+holdBtn('tJump', 'jump');
+cv.addEventListener('pointerdown', function(){ if (state === 'title' || state === 'over' || state === 'win') jumpPressed(); });
+
+C.G = '#55ff55';
+requestAnimationFrame(loop);
+
+})();
+
+</script>
+
+</body>
+</html>
