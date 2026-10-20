@@ -53,6 +53,46 @@ var st = document.createElement('style');
 st.textContent = css;
 document.head.appendChild(st);
 
+/* ---------- starfield behind the board (like the Space Raid title screen) ---------- */
+(function(){
+    var sc = document.createElement('canvas');
+    sc.setAttribute('aria-hidden', 'true');
+    sc.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;image-rendering:pixelated;';
+    document.body.insertBefore(sc, document.body.firstChild);
+    var sg = sc.getContext('2d');
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var stars = [], SW = 0, SH = 0, SCALE = 2;
+
+    function resize(){
+        SW = Math.ceil(window.innerWidth / SCALE);
+        SH = Math.ceil(window.innerHeight / SCALE);
+        sc.width = SW; sc.height = SH;
+        var n = Math.round(SW * SH / 900);
+        stars = [];
+        for (var i = 0; i < n; i++){
+            stars.push({ x:Math.random() * SW, y:Math.random() * SH, v:0.08 + Math.random() * 0.4 });
+        }
+        if (still) frame();
+    }
+    function frame(){
+        sg.fillStyle = '#000';
+        sg.fillRect(0, 0, SW, SH);
+        for (var i = 0; i < stars.length; i++){
+            var s = stars[i];
+            if (!still){
+                s.y += s.v;
+                if (s.y > SH){ s.y = 0; s.x = Math.random() * SW; }
+            }
+            sg.fillStyle = s.v > 0.36 ? '#ffffff' : (s.v > 0.22 ? '#aaaaaa' : '#0000aa');
+            sg.fillRect(s.x | 0, s.y | 0, 1, 1);
+        }
+    }
+    function loop(){ frame(); requestAnimationFrame(loop); }
+    window.addEventListener('resize', resize);
+    resize();
+    if (!still) requestAnimationFrame(loop);
+})();
+
 /* ---------- build the prompt ---------- */
 var line = document.getElementById('cmdline');
 var out  = document.getElementById('termOut');
