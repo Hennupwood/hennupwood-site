@@ -76,6 +76,12 @@ a:hover{
     background:#000;
     image-rendering:pixelated;          /* keep the blocky edges crisp */
     box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+    transition:box-shadow .15s, filter .15s;
+}
+
+.art img:hover{
+    box-shadow:0 0 26px #bb00ff, 0 0 52px #660088;
+    filter:brightness(1.15);
 }
 
 .caption{
