@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hennupwood BBS door games — play SPYCO SPACE RAID, a retro arcade shooter in the spirit of the 90s BBS scene.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>Contact — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.msgform{ margin-top:28px; max-width:620px; }
+.field{ margin-bottom:18px; }
+.field label{ display:block; color:#00ffff; margin-bottom:6px; }
+.field label .opt{ color:#666; }
+.field input, .field textarea{
+    width:100%;
+    box-sizing:border-box;
+    background:#000;
+    color:#ffff00;
+    border:1px solid #aa00aa;
+    box-shadow:0 0 10px #330044 inset;
+    font-family:"Courier New", monospace;
+    font-size:16px;
+    padding:10px 12px;
+    caret-color:#ffff00;
+}
+.field textarea{ min-height:160px; resize:vertical; line-height:1.6; }
+.field input:focus, .field textarea:focus{
+    outline:none;
+    border-color:#ff00ff;
+    box-shadow:0 0 14px #8800aa;
+}
+.hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.send{
+    font-family:"Courier New", monospace;
+    font-size:16px;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    padding:10px 22px;
+    cursor:pointer;
+    box-shadow:0 0 12px #440055;
+}
+.send:hover, .send:focus{ background:#0000aa; color:#fff; outline:none; }
+.send:disabled{ color:#555; border-color:#333; cursor:wait; background:#000; }
+.status{ margin-top:18px; line-height:1.8; min-height:1.8em; }
+.status .ok{ color:#ffff00; }
+.status .err{ color:#ff5555; }
+.status .info{ color:#0066ff; }
+
+</style>
+</head>
+
+<body data-page="contact">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+LEAVE A MESSAGE FOR THE SYSOP
+</div>
+
+<br>
+
+<div>TO................ HENNUPWOOD (SYSOP)</div>
+<div>MAILBOX........... OPEN</div>
+<div>PRIVATE........... YES, ONLY THE SYSOP READS THIS</div>
+
+<br>
+
+<div class="cyan">LOADING MESSAGE EDITOR...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<form class="msgform" id="msgform" action="https://formspree.io/f/mwlvdonp" method="POST">
+
+    <div class="field">
+        <label for="f-handle">HANDLE / NAME</label>
+        <input id="f-handle" name="handle" type="text" maxlength="60" required autocomplete="nickname">
+    </div>
+
+    <div class="field">
+        <label for="f-email">E-MAIL <span class="opt">(optional &mdash; only if you want a reply)</span></label>
+        <input id="f-email" name="email" type="email" maxlength="120" autocomplete="email">
+    </div>
+
+    <div class="field">
+        <label for="f-msg">MESSAGE</label>
+        <textarea id="f-msg" name="message" maxlength="4000" required></textarea>
+    </div>
+
+    <!-- spam trap: real visitors never see or fill this -->
+    <div class="hp" aria-hidden="true">
+        <label for="f-gotcha">Leave this empty</label>
+        <input id="f-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+    </div>
+
+    <button class="send" type="submit" id="f-send">SEND MESSAGE</button>
+
+    <div class="status" id="f-status" role="status" aria-live="polite"></div>
+
+</form>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<script>
+(function(){
+    var form = document.getElementById('msgform');
+    var btn = document.getElementById('f-send');
+    var status = document.getElementById('f-status');
+
+    function say(lines){
+        status.innerHTML = '';
+        lines.forEach(function(l){
+            var d = document.createElement('div');
+            d.className = l[1];
+            d.textContent = l[0];
+            status.appendChild(d);
+        });
+    }
+
+    form.addEventListener('submit', function(e){
+        e.preventDefault();
+        var data = new FormData(form);
+        var handle = (data.get('handle') || '').toString().trim();
+        if (!handle || !(data.get('message') || '').toString().trim()){
+            say([['FILL IN YOUR HANDLE AND A MESSAGE FIRST.', 'err']]);
+            return;
+        }
+        data.append('_subject', 'Hennupwood BBS: message from ' + handle);
+
+        btn.disabled = true;
+        say([['SAVING MESSAGE...', 'info'], ['SENDING TO SYSOP MAILBOX...', 'info']]);
+
+        fetch(form.action, { method:'POST', body:data, headers:{ 'Accept':'application/json' } })
+            .then(function(r){
+                if (r.ok){
+                    form.reset();
+                    say([['MESSAGE SAVED.', 'ok'],
+                         ['THE SYSOP WILL READ IT AFTER THE NEXT DROP. THANKS FOR WRITING!', 'ok']]);
+                } else {
+                    say([['MESSAGE NOT SENT. THE LINE IS BUSY.', 'err'],
+                         ['CHECK YOUR E-MAIL ADDRESS AND TRY AGAIN IN A MOMENT.', 'err']]);
+                }
+            })
+            .catch(function(){
+                say([['NO CARRIER. YOUR CONNECTION DROPPED.', 'err'],
+                     ['CHECK YOUR INTERNET CONNECTION AND TRY AGAIN.', 'err']]);
+            })
+            .then(function(){ btn.disabled = false; });
+    });
+})();
+</script>
+
+<script src="bbs.js"></script>
+</body>
+</html>

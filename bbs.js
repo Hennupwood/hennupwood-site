@@ -5,7 +5,7 @@
 /* ---------- where things live ---------- */
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
-    games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html',
+    games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html', contact:'contact.html',
     music:'https://soundcloud.com/hennupwoodmusic',
     soundcloud:'https://soundcloud.com/hennupwoodmusic',
     mixcloud:'https://www.mixcloud.com/ronald-van-toledo/',
@@ -16,6 +16,7 @@ var LINKS = {
 /* number keys per page, matching the menus on each page */
 var NUMS = {
     index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins' },
+    contact:  { '0':'main' },
     bulletins:{ '1':'#b1', '2':'#b2', '3':'#b3', '4':'#b4', '0':'main' },
     about:    { '1':'soundcloud', '2':'mixcloud', '3':'youtube', '4':'facebook', '0':'main' },
     archives: { '0':'main' },
@@ -160,7 +161,6 @@ function next(){
 
 function go(where){
     if (where.charAt(0) === '#'){ print('READING BULLETIN ' + where.slice(2) + '...', 'l-bl'); window.location.hash = where; return; }
-    if (where === 'contact'){ print('MAILBOX UNDER CONSTRUCTION. TRY AGAIN SOON.', 'l-pk'); return; }
     var url = LINKS[where];
     if (!url) return;
     print('LOADING ' + where.toUpperCase() + '...', 'l-bl');
@@ -222,6 +222,7 @@ function run(raw){
             '  ART           ANSI art archive',
             '  DOORS         door games',
             '  BULLETINS     news from the sysop',
+            '  CONTACT       leave a message for the sysop',
             '  WHO           who is online',
             '  TIME          system time',
             '  VER           system version',
@@ -343,6 +344,8 @@ if (!isGame){
     document.addEventListener('keydown', function(e){
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (document.activeElement === input) return;
+        var tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable)) return;
 
         var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
         pos = (key === seq[pos]) ? pos + 1 : (key === seq[0] ? 1 : 0);
