@@ -19,7 +19,7 @@ var NUMS = {
     mods:     { '0':'main' },
     whitelabel:{ '0':'mods' },
     contact:  { '0':'main' },
-    bulletins:{ '1':'#b1', '2':'#b2', '3':'#b3', '4':'#b4', '5':'#b5', '6':'#b6', '7':'#b7', '0':'main' },
+    bulletins:{ '1':'#b1', '2':'#b2', '3':'#b3', '4':'#b4', '5':'#b5', '6':'#b6', '7':'#b7', '8':'#b8', '0':'main' },
     about:    { '1':'soundcloud', '2':'mixcloud', '3':'youtube', '4':'facebook', '0':'main' },
     archives: { '0':'main' },
     art:      { '0':'main' },
