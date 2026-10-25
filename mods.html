@@ -463,12 +463,15 @@ window.HWVU = (function(){
         } catch(e){ an = []; return false; }
     }
 
+    var avgE = 0, lastBeat = 0;
     function frame(){
+        var energy = 0;
         for (var c = 0; c < 2; c++){
             an[c].getFloatTimeDomainData(buf);
             var sum = 0;
             for (var i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
             var rms = Math.sqrt(sum / buf.length);
+            energy += rms / 2;
             var db = 20 * Math.log10(rms + 1e-6);              // about -60 .. 0 dB
             var target = Math.max(0, Math.min(1, (db + 42) / 40));
             levels[c] = target > levels[c] ? target : levels[c] * 0.9 + target * 0.1;   // fast up, slow down
@@ -477,6 +480,16 @@ window.HWVU = (function(){
             for (var s = 0; s < SEGS; s++){
                 bars[c][s].classList.toggle('lit', s < lit || (s === peaks[c] - 1 && peaks[c] > 0));
             }
+        }
+        /* disco stars: tell the starfield about the level and the kicks */
+        if (window.HWSTARS){
+            HWSTARS.level((levels[0] + levels[1]) / 2);
+            var now = performance.now();
+            if (avgE > 0.004 && energy > avgE * 1.4 && now - lastBeat > 200){
+                lastBeat = now;
+                HWSTARS.beat(Math.min(1, (energy / avgE - 1) * 0.8));
+            }
+            avgE = avgE * 0.94 + energy * 0.06;
         }
         raf = requestAnimationFrame(frame);
     }

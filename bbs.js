@@ -56,7 +56,8 @@ var st = document.createElement('style');
 st.textContent = css;
 document.head.appendChild(st);
 
-/* ---------- starfield behind the board (like the Space Raid title screen) ---------- */
+/* ---------- starfield behind the board (like the Space Raid title screen) ----------
+   On the MOD AREA it dances along with the music: HWSTARS.beat() / HWSTARS.level() */
 (function(){
     var sc = document.createElement('canvas');
     sc.setAttribute('aria-hidden', 'true');
@@ -65,6 +66,8 @@ document.head.appendChild(st);
     var sg = sc.getContext('2d');
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var stars = [], SW = 0, SH = 0, SCALE = 2;
+    var boost = 0, flash = 0, lvl = 0, beats = 0;
+    var DISCO = ['#ff55ff', '#55ffff', '#ffff55', '#55ff55', '#ff5555', '#5555ff'];
 
     function resize(){
         SW = Math.ceil(window.innerWidth / SCALE);
@@ -73,27 +76,37 @@ document.head.appendChild(st);
         var n = Math.round(SW * SH / 900);
         stars = [];
         for (var i = 0; i < n; i++){
-            stars.push({ x:Math.random() * SW, y:Math.random() * SH, v:0.08 + Math.random() * 0.4 });
+            stars.push({ x:Math.random() * SW, y:Math.random() * SH, v:0.08 + Math.random() * 0.4, c:(Math.random() * DISCO.length) | 0 });
         }
         if (still) frame();
     }
     function frame(){
         sg.fillStyle = '#000';
         sg.fillRect(0, 0, SW, SH);
+        var speed = 1 + lvl * 2 + boost * 7;
         for (var i = 0; i < stars.length; i++){
             var s = stars[i];
             if (!still){
-                s.y += s.v;
+                s.y += s.v * speed;
                 if (s.y > SH){ s.y = 0; s.x = Math.random() * SW; }
             }
-            sg.fillStyle = s.v > 0.36 ? '#ffffff' : (s.v > 0.22 ? '#aaaaaa' : '#0000aa');
-            sg.fillRect(s.x | 0, s.y | 0, 1, 1);
+            var col = s.v > 0.36 ? '#ffffff' : (s.v > 0.22 ? '#aaaaaa' : '#0000aa');
+            if (flash > 0.05 && s.v > 0.18 && (i + beats) % 3 !== 0) col = DISCO[(s.c + beats) % DISCO.length];
+            sg.fillStyle = col;
+            var len = (!still && boost > 0.25 && s.v > 0.3) ? 1 + Math.round(boost * 3) : 1;   // little streaks on a hard kick
+            sg.fillRect(s.x | 0, s.y | 0, 1, len);
         }
+        boost *= 0.9; flash *= 0.88; lvl *= 0.96;
     }
     function loop(){ frame(); requestAnimationFrame(loop); }
     window.addEventListener('resize', resize);
     resize();
     if (!still) requestAnimationFrame(loop);
+
+    window.HWSTARS = {
+        beat: function(strength){ if (still) return; beats++; boost = Math.min(1, boost + (strength || 0.6)); flash = 1; },
+        level: function(l){ if (!still) lvl = Math.max(lvl, Math.min(1, l)); }
+    };
 })();
 
 /* ---------- menu bar under the logo, sticks to the top ---------- */
