@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Mod Area — 64 XM and S3M tracker modules by the Da Lama crew, 1994–1998. Play them in your browser or download the originals.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>Mod Area — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.sec{ margin-top:36px; }
+.sec-h{ color:#0066ff; letter-spacing:2px; margin-bottom:10px; }
+.bio{ max-width:760px; line-height:1.8; }
+.bio .accent{ color:#ff00ff; }
+.bio .crew{ color:#ffff00; }
+
+.pattern-wrap{ overflow-x:auto; margin-top:16px; max-width:100%; }
+pre.pattern, pre.diz{
+    margin:0;
+    background:#000;
+    border:1px solid #330044;
+    padding:12px 14px;
+    font-family:"Courier New", monospace;
+    font-size:14px;
+    line-height:1.35;
+    color:#555;
+    white-space:pre;
+    display:inline-block;
+}
+pre.pattern i{ font-style:normal; color:#333; }
+pre.pattern b{ font-weight:normal; }
+pre.pattern .n{ color:#00ffff; }
+pre.pattern .in{ color:#ffff00; }
+pre.pattern .v{ color:#55ff55; }
+pre.pattern .fx{ color:#ff55ff; }
+pre.pattern .rn{ color:#aa00aa; }
+pre.pattern .ch{ color:#0066ff; }
+pre.pattern .sep{ color:#330044; }
+.legend{ margin-top:10px; font-size:13px; line-height:1.8; }
+.legend .n{ color:#00ffff; } .legend .in{ color:#ffff00; } .legend .v{ color:#55ff55; } .legend .fx{ color:#ff55ff; }
+.example{ display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
+pre.diz{ color:#aaaaaa; line-height:1.12; }
+
+.filters{ margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+.filters button{
+    font-family:"Courier New", monospace; font-size:14px;
+    background:#000; color:#00ffff; border:1px solid #aa00aa; padding:5px 10px; cursor:pointer;
+}
+.filters button:hover{ color:#ffff00; }
+.filters button.on{ background:#0000aa; color:#fff; border-color:#ff00ff; }
+.filters .cnt{ color:#ff00ff; }
+.filters button.on .cnt{ color:#ffff00; }
+
+.year{ margin-top:26px; color:#ffff00; letter-spacing:2px; }
+.year .ln{ color:#aa00aa; }
+.flist{ margin-top:6px; }
+.frow{
+    display:grid;
+    grid-template-columns:auto 15ch 6ch 9ch minmax(0,1fr) 15ch auto auto;
+    gap:0 12px;
+    align-items:baseline;
+    padding:4px 6px;
+    border-bottom:1px dotted #1a0022;
+}
+.frow:hover{ background:#05001a; }
+.frow.playing{ background:#0000aa; }
+.frow.playing .fn, .frow.playing .ti{ color:#fff; }
+.frow .fn{ color:#00ffff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.frow .sz{ color:#777; text-align:right; }
+.frow .dt{ color:#777; }
+.frow .ti{ color:#ff00ff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.frow .ar{ color:#aaaaaa; white-space:nowrap; }
+.frow button, .frow a.dl{
+    font-family:"Courier New", monospace; font-size:13px;
+    background:#000; color:#00ffff; border:1px solid #440055; padding:2px 6px; cursor:pointer; white-space:nowrap;
+}
+.frow button:hover, .frow a.dl:hover{ color:#ffff00; border-color:#ff00ff; }
+.frow .play{ color:#ffff00; min-width:7ch; }
+.finfo{
+    display:none;
+    grid-column:1 / -1;
+    margin:8px 0 6px;
+    padding:10px 12px;
+    border-left:2px solid #aa00aa;
+    background:#04000a;
+    color:#aaaaaa;
+    font-size:13px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+.finfo .meta{ color:#0066ff; display:block; margin-bottom:8px; }
+.frow.open .finfo{ display:block; }
+
+@media (max-width:760px){
+    .frow{ grid-template-columns:auto minmax(0,1fr) auto auto; gap:2px 10px; }
+    .frow .sz, .frow .dt{ display:none; }
+    .frow .fn{ grid-column:2; }
+    .frow .ti{ grid-column:2; grid-row:2; }
+    .frow .ar{ grid-column:2; grid-row:3; font-size:13px; }
+    .frow .play{ grid-row:1 / span 3; align-self:center; }
+}
+
+.nowplaying{
+    position:fixed; left:0; right:0; bottom:0; z-index:200;
+    display:none; align-items:center; gap:14px; flex-wrap:wrap;
+    background:#000; border-top:2px solid #aa00aa; box-shadow:0 -6px 18px -6px #8800aa;
+    padding:10px 20px calc(10px + env(safe-area-inset-bottom, 0px));
+    font-family:"Courier New", monospace; font-size:15px;
+}
+.nowplaying.on{ display:flex; }
+.nowplaying .lbl{ color:#ff00ff; }
+.nowplaying .what{ color:#ffff00; flex:1; min-width:12ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.nowplaying .time{ color:#00ffff; }
+.nowplaying button{
+    font-family:"Courier New", monospace; font-size:14px;
+    background:#000; color:#00ffff; border:1px solid #aa00aa; padding:4px 12px; cursor:pointer;
+}
+.nowplaying button:hover{ color:#ffff00; }
+body.np-on .footer{ padding-bottom:70px; }
+
+</style>
+</head>
+
+<body data-page="mods">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+MOD AREA
+</div>
+
+<br>
+
+<div>FILES............. 64 MODULES</div>
+<div>FORMATS........... XM / S3M</div>
+<div>YEARS............. 1994 &ndash; 1998</div>
+<div>CREW.............. DA LAMA</div>
+
+<br>
+
+<div class="cyan">SCANNING FILE AREA...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="sec">
+    <div class="sec-h">[ ABOUT DA LAMA ]</div>
+    <div class="ansi-line"></div>
+    <div class="bio">
+        <p><span class="accent">DA LAMA</span> &mdash; also written DALAMA, DA_LAMA or DaLaMaZz &mdash; was a crew of
+        friends from the Dutch BBS scene who made tracker music in the mid-nineties. Some of the older tracks still carry
+        the name <span class="accent">JUICE</span>, the crew several members were part of before and alongside Da Lama.
+        Home base was <span class="accent">SPYCO BBS</span>: that&rsquo;s where the tracks landed first, and from there
+        they travelled from board to board.</p>
+        <p>The crew: <span class="crew">SikeE</span>, <span class="crew">Weird Ed</span>, <span class="crew">White Label</span>,
+        <span class="crew">Phrenetic</span>, <span class="crew">Necron</span> and <span class="crew">Freddy Krueger</span>,
+        with Vape, Altar, Stranixx, Feel-x and Compa around them. The files in this area date from 1994 to 1998.</p>
+    </div>
+</div>
+
+<div class="sec">
+    <div class="sec-h">[ MADE IN A TRACKER ]</div>
+    <div class="ansi-line"></div>
+    <div class="bio">
+        <p>Every track here was made in a <span class="accent">tracker</span>: ScreamTracker 3 (the .S3M files) and
+        FastTracker 2 (the .XM files). In a tracker a song is a stack of <span class="accent">patterns</span> that scroll
+        from top to bottom. Each column is a channel, and on every row you can start a note, pick an instrument,
+        set a volume and add an effect. The instruments are small samples &mdash; taken from records, synths and
+        whatever else was lying around &mdash; and the whole song, samples and all, fits in one file.</p>
+        <p>This is a real piece of <span class="crew">WHY ME</span> by SikeE: 16 rows of pattern 0F, 5 of its 18 channels.
+        Next to it, the FILE_ID.DIZ that came with it.</p>
+    </div>
+    <div class="example">
+        <div class="pattern-wrap"><pre class="pattern"><span class="rn">  </span> <span class="ch">CH05            </span><span class="ch">CH07            </span><span class="ch">CH08            </span><span class="ch">CH09            </span><span class="ch">CH16            </span>
+<span class="rn">00</span> <b class="n">C-4</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i>
+<span class="rn">01</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">20</b> <i>···</i>
+<span class="rn">02</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i>
+<span class="rn">03</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">20</b> <i>···</i>
+<span class="rn">04</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">F-4</b> <b class="in">04</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">30</b> <i>···</i>
+<span class="rn">05</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">10</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i>
+<span class="rn">06</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">40</b> <i>···</i> <span class="sep">│</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i>
+<span class="rn">07</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">F-4</b> <b class="in">04</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">20</b> <i>···</i>
+<span class="rn">08</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i>
+<span class="rn">09</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">10</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">20</b> <i>···</i>
+<span class="rn">0A</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">F-4</b> <b class="in">04</b> <b class="v">40</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i>
+<span class="rn">0B</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">10</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">20</b> <i>···</i>
+<span class="rn">0C</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">F-4</b> <b class="in">04</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i>
+<span class="rn">0D</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">20</b> <i>···</i>
+<span class="rn">0E</span> <i>···</i> <i>··</i> <i>··</i> <i>···</i> <span class="sep">│</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">10</b> <i>···</i> <span class="sep">│</span> <b class="n">C-5</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">30</b> <i>···</i>
+<span class="rn">0F</span> <b class="n">C-6</b> <b class="in">11</b> <i>··</i> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">40</b> <i>···</i> <span class="sep">│</span> <i>···</i> <i>··</i> <b class="v">05</b> <i>···</i> <span class="sep">│</span> <b class="n">C#7</b> <b class="in">07</b> <i>··</i> <i>···</i></pre></div>
+        <div class="pattern-wrap"><pre class="diz"> ▌           ▄   ▌  ▄  ▄     ▄        ▐
+ █       ▄  █ █  █ █ █ █▀▄▀▌█ █       █
+  ▌    ┌─█▀▄▐ ▌──▐─▐─▌─▐─▐─▌▐─▌─┐    ▐
+  █    │ █ █▌▄▌  ▐ ▐▄▌ ▐ █ ▌▐▄▌ │    █
+  ▐▌   └─█▄▀▐─▌──█▄█─▌─█ ──█▐─▌─┘   ▐▌
+  █      ▌  █ █  ███ █ █   █▐ █      █
+ █          ▌ ▐    ▌ ▐     ▐  ▐       █
+▐▌                                    ▐▌
+ █        ▄                 ▄         █
+  ▌ ┌■■▀▄▀                   ▀▄▀■■┐  ▐
+  █     LaMeR  : SikeE               █
+  ▐▌    NaMe   : W H Y  M E         ▐▌
+  █     BpM.   : 140/6               █
+  ▌     ReLeAse: 10/FEb/1996         ▐
+ █      ExTeNs.: Xm 16b44Khz          █
+ ▌  └■■▄▀▄                   ▄▀▄■■┘   ▐
+ ▌        ▀▄               ▄▀         ▐
+ █        MeLLoW/TRaNcE/CybEr         █</pre></div>
+    </div>
+    <div class="legend">
+        <span class="n">C-4</span> note &amp; octave &nbsp;
+        <span class="in">11</span> instrument &nbsp;
+        <span class="v">20</span> volume &nbsp;
+        <span class="fx">A08</span> effect &nbsp;
+        &middot;&middot;&middot; empty
+    </div>
+</div>
+
+<div class="sec">
+    <div class="sec-h">[ FILES ]</div>
+    <div class="ansi-line"></div>
+    <div class="bio">Press <span class="crew">PLAY</span> to listen right here, <span class="crew">INFO</span> for the
+    texts the makers hid in the sample names, or <span class="crew">DL</span> to download the original file.</div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by maker"></div>
+    <div id="files"></div>
+</div>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<div class="nowplaying" id="np" role="region" aria-label="Now playing">
+    <span class="lbl">&#9658; NOW PLAYING</span>
+    <span class="what" id="npWhat"></span>
+    <span class="time" id="npTime">00:00</span>
+    <button id="npPause">PAUSE</button>
+    <button id="npStop">STOP</button>
+</div>
+
+<script>
+var MODS = [{"f": "c_o7day.xm", "n": "(C)O7DAY.XM", "t": "CroNiCleS", "a": "Necron", "y": 1995, "d": "23-04-95", "s": 793529, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 125, "i": "CroNiCleS AhBaWuBBa\nAaah ShiT WhaT KinD\nOf LaNGuaGe Is ThiZ?\n.....Uhhhh DuNNoW!!!!\nJuSt GoNNa DrinK My\nFuCKinG BeeR.....\nSaiD: NeC(r)oN\nFuCKED aT:\nSpYcO X BuT I ThinK\nThaT SpYcO DoeSn`T\nLiKe ThaT ...ehehe\nGreeTz EvErYboDY!!!!!"}, {"f": "carnage.s3m", "n": "CARNAGE.S3M", "t": "CARNAGE", "a": "Weird Ed", "y": 1995, "d": "19-01-95", "s": 519488, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 11, "bpm": 127, "i": "         CARNAGE\n\nHi'S & HO'S 2: SiKE, VAPE,\n               WHiTE LABEL\n\n AND EVERY1 iN jUICE . . .\n\n  CALL THiS GR8 BOARD:\n\n──────── ·     · ──────────\n  SpYcO +31(0)XXXXXXXXX\n──────── ·     · ──────────\n 28k8 and..and..ah...call.\n iF YA WANNA HEAR iN FULL\n CONDiTiON, PLAY WiTH DMP!\n iPLAY SCREWS THiS S3M UP!\n YEAH!Yeah!yeah...does it?\n Yes, it does.Iplay leaves\n one channel out (or more)\n and DMP not.Strange huh ?\n\n full playing time : 7:30m\n this S3M requires a  high\n quality sound card (SB16,\n PAS16, etc. . . . . . . )\n\n --Weird Ed/jUICE"}, {"f": "champs.xm", "n": "CHAMPS.XM", "t": "CHamPioN$", "a": "Phrenetic", "y": 1995, "d": "13-06-95", "s": 955997, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 10, "bpm": 170, "i": "  *#=PhreNeTiC=#*\n  )))  PRE$ENT$  (((\n ((( A TriButE tO )))\n       ))) AJAX (((\n   ((( CAMPiON$ )))\n ))) ofF EuropE iN (((\n     (((    1995   )))\n  )))  Oh Yeeaah  (((\n\n  (((   DA_LAmA  )))\n  )))   PrOdUzA   (((\n\nxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxx"}, {"f": "dl_artis.xm", "n": "DL_ARTIS.XM", "t": "SenSiSmilE", "a": "SikeE", "y": 1995, "d": "14-05-95", "s": 952793, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 18, "bpm": 137, "i": "Hmm this is some\nNice Monotone MuSiK\nDa LaMa\nSikeE (c) it Sux\nI mean (c) Sux\nGreetZ to ...\nques Who\n\nSenSiSmile"}, {"f": "dl_back.xm", "n": "DL_BACK.XM", "t": "BrainScan", "a": "Phrenetic", "y": 1996, "d": "02-01-96", "s": 1946945, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 130, "i": "  *** PhreNeTiC ***\n   *** DA-LAMA ***\n    *** ProduZa ***\nPresentS:........\n   -> BRAINSCAN <-\n6.40 Min.  off total\nFaciNatioN by a Movie\n   -> PhereNeTiC <-\nFly hello's go by at\nmy DA-LAMA friends\nThe party was a Great\nSuccesssss.........\nWana do it again soon\nWell this was it\nHope you'll N'joy\nBrainscan the way i do\niT was fun makin this\nsong so..............\nDate: 03/06/96\nWeather: Nice blue sky\nWhat!!!!!!!... it's\n         Fuckin Monday\nGotta Go CyA........\n......................\n///  DA-LAMA  \\\\\\\n///ALien SounD \\\\\\\n///  PhreNeTiC  \\\\\\"}, {"f": "dl_chaos.s3m", "n": "DL_CHAOS.S3M", "t": "Monotoned ChaOs", "a": "White Label", "y": 1995, "d": "29-05-95", "s": 225060, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "===========================\n\n Me am gettin' fed up with\n  da F*t*r* Cr*w's ST.\n Somebody ... PLEASE...,\n   send me 500 Bucks so me\n can buy another F*ckin'\n   board. And then I can\n finally make MUSIC instead\n  of S3M's on Tr*T*N's FT.\n\n           YA DIG ?\n===========================\n\n * Software Piracy's Censur\n===========================\n\n Aah mY ReSpeCTz\n\n aRE ViBiNG out to all me\n  Da LaMa Compagnion LamaZz\n\n===========================\n\n Aaj noow itsa riemiks bat\n noowan hes dannit laajk\n dis.\n\n        WhîTε £ab≡£..."}, {"f": "dl_compa.xm", "n": "DL_COMPA.XM", "t": "Compadrez", "a": "Weird Ed", "y": 1996, "d": "15-07-96", "s": 462432, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 24, "bpm": 130, "i": "       Compadrez\n\n   Weird Ed/DaLaMaZ\n\n   Greetings to all\n   DaLaMa beings...\n\n-(c)'96---------------\n.........4:58........."}, {"f": "dl_cort.s3m", "n": "DL_CORT.S3M", "t": "CeReBraL CoRTeX", "a": "White Label", "y": 1995, "d": "14-03-95", "s": 236510, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 122, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\nYezzzzz....\n    Another CYBA_JAM ....\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nby:\n    -=≡ WhîTε £ab≡£ ≡=-\n\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\nYa'll godda check\n       me CYBA_SPOT:\n\n       SpYcO's BBS\n      (#XXXXX-XXXXX)\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nGREETZZZZ go out 2 all me\n         Cyba_Punks\n            o f\n       -=≡ JUICE ≡=-\n\nRESPECT for\n   DA CANNABOID EXPERIENCE\n.... you guys are doin a\n               good job....\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\nMe am outha here..........."}, {"f": "dl_dream.xm", "n": "DL_DREAM.XM", "t": "Dream On", "a": "Weird Ed", "y": 1995, "d": "15-05-95", "s": 139405, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 130, "i": "--==--==--==--==--==--\nDream               On\n--==--==--==--==--==--\n5:07 Seconds   of pure\ntrance,   created  for\nthe  ones  that  enjoy\nthis  kind of  music..\n--==--==--==--==--==--\nCreated  By  Weird  Ed\nFor      Da      Lamas\n--==--==--==--==--==--\nGreetings          to:\nSikeE,    White Label,\nNecron,      Stranixx,\nVape,          Feel-x,\nand the   rest of Dl..\n--==--==--==--==--==--\n(c)1995    Weird Ed/DL\n--==--==--==--==--==--\nPs:   Play   in   Ft2!\nCubic screws  this up.\n--==--==--==--==--==--"}, {"f": "dl_dta.xm", "n": "DL_DTA.XM", "t": "D T A", "a": "SikeE", "y": 1996, "d": "06-10-96", "s": 1001252, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 22, "bpm": 143, "i": "   Just another bad\n  Bad release BY me\n          Sikee\n\n        But Okay\n\n  Dupont (Kewl Muzic)\nHumanooit (Joke Dude)\n     MorNIng WooD\n\n And All Other Suckers\n\n Still Do nOt Look For\n            Us\n\n Some samples Taken\n   From My quasimIdi\n          Raven"}, {"f": "dl_end.xm", "n": "DL_END.XM", "t": "No EnD....", "a": "SikeE", "y": 1995, "d": "23-04-95", "s": 1172466, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 140, "i": "/]SiKeE[\\\nDa LaMa DL\nTraNce KiNd Of\nThIng\nPlaY In FT2\nGreetZ To I And I\nWL\nNecron\nWeird Ed\nFreddy Krueger\nAltaR Hurry\nVaPe\n-=[]=-=[]=-[]-=-[]-=[]\nWell CanT Find No End\nLets Hunt Samples"}, {"f": "dl_ent.xm", "n": "DL_ENT.XM", "t": "Entrance of Madness", "a": "SikeE", "y": 1996, "d": "20-01-96", "s": 1202332, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 14, "bpm": 140, "i": "   Thought ya were\n   'rid of me ...\n    Haha ...\n\n    DalamaZz are here\n     to stay ....."}, {"f": "dl_equa.xm", "n": "DL_EQUA.XM", "t": "eQualipse", "a": "Weird Ed", "y": 1996, "d": "12-12-96", "s": 459499, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 28, "bpm": 135, "i": "Really old stuff...\nBut still nice,\nthis one was made in\njanuari 1996\n\n            Weird Ed\nDdAaLlAAMMaAzZz\n\ngreetings to my\n\n      followers\n\ntrancemaster 10 alike\nmusic.."}, {"f": "dl_glow.xm", "n": "DL_GLOW.XM", "t": "Glowing Whispers", "a": "White Label", "y": 1996, "d": "20-01-96", "s": 797662, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 130, "i": " Influenza ......\n    it's Killin' me\n\n Thanx a lot man !!!!\n next time put a\n  rubber on ya nose\nwhen ya talk to me Man\n\n       ========\n\nYou don't always\n    know who's right,\nBut you always know\n  who is in \"Charge\".\n\nWhite Label ========\n=========DaLaMaZz.."}, {"f": "dl_groov.xm", "n": "DL_GROOV.XM", "t": ".grooverider.", "a": "Weird Ed", "y": 1997, "d": "14-01-97", "s": 553997, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 26, "bpm": 142, "i": "-- -   weird ed\n      da lama     - --\n\n      track time\n         5:23\n          bpm\n          142\n\n--- -- -\ncopyright '97 weird ed\n        da lama\n              - -- ---\n\n  I got a lot of\n inspiration from the\n    7th iT album..\n\n Buy it, it's fucking\n    great.."}, {"f": "dl_hard.xm", "n": "DL_HARD.XM", "t": "7 : 45", "a": "White Label", "y": 1996, "d": "20-08-96", "s": 419955, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 150, "i": "       Its Hard\n     White Label\n     D A L A M A\n\n   D  A  l  A  M  A\n\n      Very Hard"}, {"f": "dl_hill.xm", "n": "DL_HILL.XM", "t": "The HiLL", "a": "SikeE", "y": 1995, "d": "18-07-95", "s": 915787, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 18, "bpm": 145, "i": "No Speech In here\nIm Just a Lazy Bastard\nThe SIH ..Pfff ehe BLa\n\nTranzing CYberShit\n\nTo ST*NeD Again\n\npreview i said"}, {"f": "dl_hthvn.xm", "n": "DL_HTHVN.XM", "t": "HardTranze Heaven", "a": "Weird Ed", "y": 1995, "d": "10-08-95", "s": 170038, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 125, "i": "----------==----------\nDa   Lamaz   presents:\nHardTranze      Heaven\nCreated  by  Weird  Ed\nGreetings    go    to:\nThe  whole   Da   Lama\ncrew,especially SikeE,\nNecron,White Label and\nPhrenetic. Further  to\nSpeedy B,    Rembeezzt\nand           Charon..\n(c)1995    Weird Ed/DL\n----------==----------\nB.t.w...Play  in Ft2..\nDiz one  doesn't sound\nso  good   in  Cubic.."}, {"f": "dl_hyper.xm", "n": "DL_HYPER.XM", "t": "HyPeRZz", "a": "White Label", "y": 1996, "d": "24-01-96", "s": 1276809, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 110, "i": "   Tranquilized\n     under extreme\n  pressure ......\n\n  Fuck it ... fuck 'm\n  all ...\n\n  The hard center\n\n  still contineous ...\n\n   .... DaLaMaZz\n\n     White Label\n\n       23/01/96"}, {"f": "dl_immor.s3m", "n": "DL_IMMOR.S3M", "t": "Immortality", "a": "White Label", "y": 1995, "d": "24-04-95", "s": 294688, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n blablabla\n      lalalala\n            etc.\n\n Play diz MF. with CubiC\n and add da following\n parathing to da command\n line to give ya mods\n a REAL fine sound:\n\n c:\\cubic>\n\n cp -vp100,a200,ecathedral\n\n Respect to all me\n    -=≡ JUICE ≡=-\n  compagnion lamaS\n\n See SpYcO or X for CubiC\n\n       .....till next time.\n\n       WhîTε £ab≡£\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-"}, {"f": "dl_india.xm", "n": "DL_INDIA.XM", "t": "DaiLa LamA", "a": "SikeE", "y": 1995, "d": "14-05-95", "s": 478118, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 18, "bpm": 125, "i": "India StyLE\nDa LaMa ..\n/]SikeE[\\\nNo melodIe in here,,..\nJusT....\nGreetZ To\nRTF OF BAd NEws\nCarLos EscobaR\nFor Spreading Our\nDa Lama Music Shit\n\nTaKe Tha SpLiFF\n=-=-=-=-=-=-=-=-=-=-=-\n\n[][][][][][][][][[][]\n\n||||||||||||||||||||"}, {"f": "dl_inhal.xm", "n": "DL_INHAL.XM", "t": "Diep Inhaleren", "a": "SikeE", "y": 1995, "d": "25-04-95", "s": 925911, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 8, "bpm": 160, "i": "\\]SiKeE[/\nDiep Inhaleren\nEn Ja Hoor\nDie komt aan...\nGreetZ To\n?\nSpYcO ...\nSpYcO X"}, {"f": "dl_jungl.xm", "n": "DL_JUNGL.XM", "t": "untitled", "a": "Necron", "y": 1995, "d": "12-04-95", "s": 180320, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 8, "bpm": 145, "i": "Oh damn You!!!!\nHmm this is some\nkinda trance uhh...\nshit if you like it...\nfine...if you dont..\nthen piss off !!!!!\nMotherfucker!!!!\nGreetZ NeCroN"}, {"f": "dl_last.s3m", "n": "DL_LAST.S3M", "t": "Da last 70 weeks", "a": "White Label", "y": 1995, "d": "31-05-95", "s": 111860, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": " For those who understand:\n BEWARE !! Course we al-\n ready had an earthquake in\n Greece. Nostrawarningz !!\n No way to stop it,\n  It's da Law !!\n\n       WhîTε £ab≡£/Da LamaS"}, {"f": "dl_loss.s3m", "n": "DL_LOSS.S3M", "t": "Lost in X2C", "a": "White Label", "y": 1995, "d": "12-04-95", "s": 168856, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "\\the undertaker/"}, {"f": "dl_machi.xm", "n": "DL_MACHI.XM", "t": "DaLaMachine", "a": "White Label", "y": 1994, "d": "11-06-94", "s": 1110144, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 213, "i": ""}, {"f": "dl_mag.xm", "n": "DL_MAG.XM", "t": "Underwater Magic", "a": "White Label", "y": 1994, "d": "27-06-94", "s": 1022592, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 140, "i": "White Label\\DaLaMaZ\n\nAugusta\\1995"}, {"f": "dl_melli.xm", "n": "DL_MELLI.XM", "t": "Just Another Mellow Tune", "a": "SikeE", "y": 1996, "d": "20-08-96", "s": 1854205, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 22, "bpm": 135, "i": "          SikeE\n  Just another Mellow\n           TuNe\n    And after That\n    A SpAcY Tune\n    For The Party\n   at frapoos Beach\n       D A L A M A\n\n  Do not look for us\n   Where NoT here\n\n Samples Taken Of the\n      RaVeN SynTh"}, {"f": "dl_menab.xm", "n": "DL_MENAB.XM", "t": "mental absence", "a": "Weird Ed", "y": 1996, "d": "23-03-96", "s": 521242, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 32, "bpm": 140, "i": "----------------------\n\n    after a little\n      recez. . .\n\n       weird ed\n       da lamaz\n\n    mental absence\n   herbal  pleazure\n\n       da lamaz\n      subzstance\n          of\n     scenthethicz\n\n-(c)'96---------------"}, {"f": "dl_mind.s3m", "n": "DL_MIND.S3M", "t": "OfF_BeaT MiNd_F#Ck", "a": "White Label", "y": 1995, "d": "22-05-95", "s": 215696, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "===========================\n Don'T Ya LuvThem oFFbeATs\n\n WaTchiT ! Da OffBeaT_PaRT\n         is FreakY\n\n Or something Li|<e That\n===========================\n messy 4 Altar:\n\n dear Altar,\n\n HURRY DA FUCK UP !!!!!!!\n===========================\n\n GreeTZz to Grunninguh\n      to da Whole\n  Carlos'Crew\n        and his SISTA !!!\n\n===========================\n\n Special greeTZz to SikeE,\n NeCroN, Viper/StraNiX/...,\n L.S. Weard EttePeT, FreDDy\n , and all da rest of them\n  -=JuiCe=- Lamas\n\n===========================\n\n WhîTε £ab≡£ signin' off..."}, {"f": "dl_monda.s3m", "n": "DL_MONDA.S3M", "t": "Monday Mornings", "a": "White Label", "y": 1995, "d": "02-05-95", "s": 121156, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n  _-=≡ JuiCe Da LamaS ≡=-_\n\n          presents\n\n       Monday Mornings\n\n             by\n\n   _-=≡ WhîTε £ab≡£ ≡=-_\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n Ps.  Me was FlinstoneD\n      last MelloW_PartY\n      HOW bout you\n      SpYcO and X ?\n      Hope Ya survived\n      that F*cking Monday."}, {"f": "dl_money.xm", "n": "DL_MONEY.XM", "t": "Money Money Money", "a": "Necron", "y": 1995, "d": "18-07-95", "s": 733557, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 14, "bpm": 143, "i": "Money money money...\nEhrmz... Tja....\nNergens goed voor...\nMaargoed boring..\nGreetZ NeCroN\nand to all the Da LaMa\nDuDeZ I KnoW...\n\nL8Terz."}, {"f": "dl_mongo.s3m", "n": "DL_MONGO.S3M", "t": "Freddy's Mongoose (RMX)", "a": "Freddy Krueger", "y": 1995, "d": "28-01-95", "s": 649932, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 112, "i": "This is for all the acid\nfreaks in the rave world!!!\nIt comes from Elmstreet\nYEAh  Freddy Krueger!!!\n\nI must say that i didn't\nlike sound of tha acid\nafter i had played it a\ncouple of times.\n\nSo it's the first AND\n LAST module with acid..\n\nI admire all the acid\ncomponers because their's\nsound OK.\n\nGreetz:\n\nVlembo\nDJ PIER\nOptimus Prime\nZone tripper\nHioCheer\nDominator\n\nspecial greetz II :\n  DISTRO SIDE : SpYcO BBS\n  #XXXXX-XXXXX\n\nAnd everyone of :\n   Juice crew\n    (or Juice's new name)\n\nThe sampz are sampled\non my raiser editor\n\nFrom tha great acid-song\n Mongoose - Straight Up\n             (Wris Spec)\nBTW i kinda RMXED it.\nSpread it like hell\n\ncYa for my nxt module\n\n You can write me for\n   sugestions.\n  Call tha distro side\nand write II Freddy Krueger"}, {"f": "dl_nocom.xm", "n": "DL_NOCOM.XM", "t": "untitled", "a": "SikeE", "y": 1995, "d": "07-04-95", "s": 948452, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 146, "i": "well I sufered while i\nI and I was making\nThis TeetH Is Out\nSiKEE ....DLJ\nJuICE Da LaMa\nMEssi To\nCarlos\nlekker graanjenever\nUt groningen"}, {"f": "dl_not.xm", "n": "DL_NOT.XM", "t": "Niks", "a": "SikeE", "y": 1995, "d": "26-04-95", "s": 906012, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 145, "i": "Niks\nNothinG\nNiks\nNothiNG\nJust Fucking Thiz MOd\nHmm geen zin meer"}, {"f": "dl_once.xm", "n": "DL_ONCE.XM", "t": "Once and NO MORE!", "a": "Weird Ed", "y": 1996, "d": "03-10-96", "s": 165280, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 200, "i": "weird ed presenta\nONCE AND NO MORE\nlittle something I\nmade for my gabber\nMichael van Haaften..\njust an experiment\nnothing special\nfuck it I'm getting a\nheadache gonna put\non some relaxing\ntrance now..mzl\n     dalama prodz!"}, {"f": "dl_osmo.s3m", "n": "DL_OSMO.S3M", "t": "Osmosis", "a": "White Label", "y": 1995, "d": "26-04-95", "s": 161513, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 106, "i": " Osmosisssssssssssssssss\n      Da hard version ..\n\n Another JuiCe_Track\n          by\n      WhîTε £ab≡£\n\n Rememba only play diz\n  with CubiC_Player\n\n and add da following\n parameter to da CP command\n\n -vp100,a250,ecathedral\n\n ! But SpYcO did already\n   know....X didn't      !\n\n       .... till next s3m."}, {"f": "dl_parab.xm", "n": "DL_PARAB.XM", "t": "ParAbNorMal", "a": "SikeE", "y": 1995, "d": "19-08-95", "s": 547742, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 18, "bpm": 125, "i": "DaLAMA DaLaMA DaLaMa\nIn The HiGHeSt\nOf TiBet\nGReetZ\nBazzToonEn\nPaRaDox Is LiVinG\nRbi\nNo Loops\nNeCRoN\nWl DaLaMacHine\nME SIkE DaLamAgneeT\nDalamagma\nTha LiON of ZioN\nCarLos\nProJecT X\nVape is comming back\nGekke Ed\nKiPBRiGAde\nOmUSe\nMoonchild\nPhrenetic\nDunno\nThe Tri Muskitchtiers\nHmm The fucking phone\nThe candyman\nWho wants a quarter\n\nanyhow its summer\nLets Go to the beach\n\nIm Sike\nWalking On Air\nIn Orbit\nZodiac galaxy"}, {"f": "dl_perso.xm", "n": "DL_PERSO.XM", "t": "No Personality", "a": "White Label", "y": 1995, "d": "29-06-95", "s": 1202292, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 160, "i": "Nameless song i think.\nEhm No PeRsoNaLiTy\nSo be free and Xplore.\nGreetZ NeCroN\n\nAnd To All Da LaMa\nDuDeZ... Yoho! All !!!"}, {"f": "dl_prof.xm", "n": "DL_PROF.XM", "t": "Profound", "a": "Weird Ed", "y": 1996, "d": "24-09-96", "s": 617215, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 22, "bpm": 135, "i": "    Weird Ed\n     Dalama Prodz"}, {"f": "dl_punch.xm", "n": "DL_PUNCH.XM", "t": "EtErNaL PuNNiSHmeNT", "a": "White Label", "y": 1995, "d": "13-04-95", "s": 214223, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 125, "i": "≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n   DIZ ONE GOES OUT 4\n          PUNNISHER\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n\nYezzz..\nAnother DOPE-DEF-JAM\n       by WhîTε £aB≡£\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\nGreetz go out to all m\n           of\n        -=JUICE=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n\n  Check me CYBA-SPOT:\n\n      SpYcO 's BBS\n      (#XXXXX-XXXXX)\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n\nSiKe.....without you I\n\n      ... you know it\n\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n-=≡=-=≡=-=≡=-=≡=-=≡=-="}, {"f": "dl_pure.xm", "n": "DL_PURE.XM", "t": "pure tribute", "a": "Weird Ed", "y": 1996, "d": "07-05-96", "s": 593466, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 26, "bpm": 129, "i": "----------------------\n\n       weird ed\n       da lamaz\n\n         pure\n        tribute\n\ngreets to all dalamazz\n\n-(c)'96---------------"}, {"f": "dl_quik.s3m", "n": "DL_QUIK.S3M", "t": "Quick, Fast and in a Hurry.", "a": "White Label", "y": 1995, "d": "17-03-95", "s": 330876, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 115, "i": "≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nNo Fuzzzz.....\n...Just ol'fashion HardCore\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\nBy:\n        WhîTε £ab≡£\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nCheck me CYBA_SPOT:\n\n        SpYcO's BBS\n       (#XXXXX-XXXXX)\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nGreetzzzz to all me\n        -=≡JUICE≡=-\n           compagnionzzz...\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n               ... Da Lamas\n\n             ∞"}, {"f": "dl_siblo.xm", "n": "DL_SIBLO.XM", "t": "Blowing My Mind", "a": "SikeE", "y": 1995, "d": "09-04-95", "s": 1003838, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 8, "bpm": 149, "i": "(Blowing My MiNd)\n+BloWiNg me MiNd+\n-BlowIng My Mind-\n=Blowing My mind=\n@BlOwiNg My MInD@\n[Blowing My MiNd]\n{Blowing My Mind}\n/ ]SiKeE [\\\nGreeTZ GO to\nI And I\nJDL JUICE da LaMa\nyeye This is really\nBlowing My MinD"}, {"f": "dl_simpl.xm", "n": "DL_SIMPL.XM", "t": "Simplistex One", "a": "SikeE", "y": 1997, "d": "16-04-97", "s": 724866, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 138, "i": "        Simplistex\n        Simplistex\n             By\n           Sikee\n          dalama\nGreetz to al who call\n              to\n       Soundgarden\n              mail\n skdalama@concepts.nl\n         Simplistex\nI Always Make My xmes\n       with My alesis\n      Quadraverb (tm)\nI suggest You do that\n                to\n  Because its sound's\n      much better\n\n  This is Nice Mellow\n    Don,t You Think\nThere  Is always More\n          to come.\n\n  I hope Nobody notice\n      there samples\n\n      This sux Vape\n        Really sux\n           Dopey\n         Really Sux\n        White Label\n   Really Really Sux\n        Weird Ed!!!\n       It just Sux\n\n         Part One"}, {"f": "dl_simpt.xm", "n": "DL_SIMPT.XM", "t": "Simplistex Two", "a": "SikeE", "y": 1997, "d": "16-04-97", "s": 1241398, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 22, "bpm": 140, "i": "    Simplistex Two\n  By Sikee dalama\n       to be weird"}, {"f": "dl_sined.xm", "n": "DL_SINED.XM", "t": "SinedToTheUndefined", "a": "Weird Ed", "y": 1997, "d": "23-01-97", "s": 497625, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 24, "bpm": 149, "i": "Sined To The Undefined\n---- --- -- -\n (c)(p) 1997 Weird Ed\n       Da Lama\n         - -- --- ----\n      Track Time\n         6:23\n          BPM\n    149/197 Speed 4\n--- -- -\n\n     dDaAlLaAmMaA\n\n  THe  eXtraTesTicaL\n     MuSiC  LabEL"}, {"f": "dl_smart.xm", "n": "DL_SMART.XM", "t": "SmarTaniA", "a": "White Label", "y": 1994, "d": "23-05-94", "s": 620254, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 18, "bpm": 128, "i": " Da feelin is back ...\n\n A U4ian feelin called\n\n    Smartania.......\n\nDiz. is NOT a real .XM\n .diz is a Tracked s3M\nI fucked it up but I\nrealease thiz Mutha..\nanyway coz me spend\n4 fuckin weeks on it !\n GreeTZz to all DaLama\n Compagnion LamaZz ...\n GreetZz to Grunninguh\n L.S.- D. and SmartY\n Hooligan P. and TefaL\n BAS TOoNEN ,HetKurt\n and all da rest of da\n Fuckin Freaks.\n\n For now... Playboy\n rules... (NOT)\n  So does Da LaMaZz\n\n  ==  White Label ==\nShit no ascii .....\nPlay in FT cause Cubic\nsux with .diz track !"}, {"f": "dl_sound.xm", "n": "DL_SOUND.XM", "t": "Sound", "a": "White Label", "y": 1996, "d": "28-08-96", "s": 833640, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 130, "i": "DaLaMaZz\nWhite Label\nsampz by Bachelor Fish\nhis MC303\nNew Sounds ....\n   ... so good ."}, {"f": "dl_space.xm", "n": "DL_SPACE.XM", "t": "SPACE  ESCAPED", "a": "SikeE", "y": 1996, "d": "04-06-96", "s": 1978016, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 24, "bpm": 143, "i": "             Sikee\n     Space EsCaPed\n  ambient tranze style\n\n         D A L A M A"}, {"f": "dl_speed.xm", "n": "DL_SPEED.XM", "t": "Da Speed Freak", "a": "Weird Ed", "y": 1995, "d": "01-08-95", "s": 193469, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 120, "i": "----------==----------\nDa     Speed     Freak\n----------==----------\nCreated  by  Weird  Ed\nFor     Da     Lamazzz\n----------==----------\nHmmzz.. Special greetz\ngo  to  all   Da  Lama\nmembas, Speedy B and\nRembeezzt...   Zee ja.\n----------==----------"}, {"f": "dl_stit.xm", "n": "DL_STIT.XM", "t": "Techno or Not", "a": "SikeE", "y": 1997, "d": "18-04-97", "s": 1060994, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 24, "bpm": 140, "i": "         bY Sikee\n       Of dalama\n\nskdalama@concepts.nl\n\n       techno or not\n\n        Greetz to all\n    There Could be A\n          Mistake\n        Somewhere"}, {"f": "dl_thrut.xm", "n": "DL_THRUT.XM", "t": "The Thruth", "a": "Weird Ed", "y": 1995, "d": "04-05-95", "s": 170448, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 164, "i": "--==--==--==--==--==--\nThe             Thruth\n--==--==--==--==--==--\n358     Seconds     of\nravishing     hardcore\nmade   for  tha   real\nhardcore        freaks\nout           there...\n--==--==--==--==--==--\nCreated  By  Weird  Ed\nFor      Da      Lamas\n--==--==--==--==--==--\nGreetings          to:\nSikeE,    White Label,\nNecron,      Stranixx,\nVape,          Feel-x,\nand  the  rest of DL..\n--==--==--==--==--==--\n(c)1995    Weird Ed/DL\n--==--==--==--==--==--"}, {"f": "dl_time.s3m", "n": "DL_TIME.S3M", "t": "4 Da Old Times   (HakkuH)", "a": "White Label", "y": 1995, "d": "05-04-95", "s": 322828, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 111, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n Diz 1 Goes out 4 Doze That\n Can Recall da Immortality\n Party on 28 AUG. 1993\n Hall 1 was really HaKKuH\n ....... Rememba ?\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n Special Greetz 4 me\n   --==≡≡JUICE≡≡==--\n      compagnions\n\n         .... Da Lamas --))\n\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n Ya'll Godda Check our\n        Cyba_Spot\n       SpYcO's BBS\n      (#XXXXX-XXXXX)\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n WhîTε £ab≡£ says:\n     MIEJEMOUTOFEER .....?"}, {"f": "dl_tran.xm", "n": "DL_TRAN.XM", "t": "The Trance Journey", "a": "Weird Ed", "y": 1995, "d": "26-06-95", "s": 215173, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 14, "bpm": 130, "i": "--==--==--==--==--==--\nThe   Trance   Journey\n--==--==--==--==--==--\nCreated   By  Weird Ed\nFor      Da      Lamas\n--==--==--==--==--==--\nEnjoy    these    4:01\nminutes  of  trance...\n--==--==--==--==--==--\nThe greets  are flying\nout    to   all    the\nDa                Lama\nmembas...  Just   keep\non       produzing....\n--==--==--==--==--==--\n(c)1995    Weird Ed/DL\nAaah...copyright sux..\nBut    that    doesn't\nmatter  right  now....\nJust  listen   to  the\nvibes  and  experience\nthe Da Lama feeling...\n==--==--==--==--==--==\n--==--==--==--==--==--"}, {"f": "dl_tranz.xm", "n": "DL_TRANZ.XM", "t": "T R A N Z I N G  X", "a": "White Label", "y": 1996, "d": "04-06-96", "s": 1216261, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 24, "bpm": 170, "i": "   W H I T E L A B E L\n           dalama\n       EverGiving X\n\nfor a smashing x party\n       I never had the\n            chance\n         D A L A M A"}, {"f": "dogs.xm", "n": "DOG$.XM", "t": "MooNDoG$", "a": "Phrenetic", "y": 1995, "d": "27-12-95", "s": 1572582, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 14, "bpm": 128, "i": "   ***MooNDog$***\nWeLL,  iT's   $imPle.\ntHe Night i $tarted..\ntHi$,  \"FreAkiN  AlL\nKinDa $tyLe$\".........\n.XM PhiLe,  The _M#F_\nDoG(shit) From dA M#F\nnEighBour$ wAs BarKin\nLikE M#F HelL.......\nThaT mAde iT ea$y.....\nYou WannA  No Y......\ni piCKet uP A BriCk..\nTo smash The DoG'$\nDoGSHIT BraiN when i\nNoti$t tHe MooN Wa$\nuP in tHe $kY.........\n---------------------\nNAME :  \"PhreNeTiC\"\nGROUP :   DA_LAmA\n----------------------\nGrEEtinG'$  4  *1996*\n  & kEEp oN RockiN\n4 Tho$e Who LikE 2...\n-------MOVE-----------"}, {"f": "dl_whyme.xm", "n": "DL#WHYME.XM", "t": "Why Me", "a": "SikeE", "y": 1998, "d": "28-09-98", "s": 864625, "fmt": "XM", "tr": "MadTracker 2.0", "ch": 18, "bpm": 144, "i": "         Why mE\n       why   Not\n             me\nOkay carlos here is\nsome new sjit\nwhere still here\nlfo\ngreetz to\nnamaste\nomuse\nkipB\nescobar\nlmi who ever you are\ndopey cc\nbad news\nalways there\nfew dalamaz has left\nuz\nsoundgarden\nwarlord  we come\n\ndo not contact us\nwe are not here\nSpYcoo  xx\nvape Iz back\nweird ed is gone\nfreddy is gone\nKurt is In\nWhite label walked\naway from home hehehe\nFeel will Come\nprenethic stil with us"}, {"f": "fk-free.s3m", "n": "FK-FREE.S3M", "t": "Freddy free's the world", "a": "Freddy Krueger", "y": 1995, "d": "27-05-95", "s": 406270, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "Good day  MiDnIgHt PeOpLe\n\nAfter a long dream\n  I'm back  in your head\nI'll break the silence\n  and mayby something else\n ha ha  ha  haha\nFREE THe world\n  FREEE THe  WOoOrld\nYEAAaAaAHhHhHhHhHh\n\nthe three samples are\n very good .\nCauze the world must be\n free to do what we wanna\ndo\n\nFor the greetz  i shall say\n\n1st : distro side:\n        SpYcO BBS :\n         #XXX-XXXX-XXXXX\n\n2nd : Tha Juice posse\n\n3rd : The TCK posse\n       (U know who i mean)\n\n4th : Problem posse\n       (U don't know...yet)\n\nand a big greet II :\n   Randy Andy!!!!!!!!!\n\nCheck your head ....\n    is it still on????\n\n(C)opyright & (P)roduced by\n(E)lmstreet records!!!!"}, {"f": "flow.xm", "n": "FLOW.XM", "t": "ThE  FLoW", "a": "Phrenetic", "y": 1995, "d": "27-12-95", "s": 1358663, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 128, "i": "  Dam'n MiddLe O/T\nNigHt, juSt coulD noT\nStoP........\niT BcaMe   A  MeLLoW\nKinDa  StyLe, don'T...\nReaLy  KnoW  WerE....\ni FounD iT........\nBut  ThaT  doEs no\nMatteR  2 Me ANyWAy..\n----------------------\nNAME:  PhreNeTiC\nGrouP:  DA_LAmA\n----------------------\n   NicE SounDs OnLy\nSo   N'joY  The   RiDe\n----------------------"}, {"f": "neigh.xm", "n": "NEIGH.XM", "t": "NEigHbouRs", "a": "Phrenetic", "y": 1995, "d": "19-05-95", "s": 851040, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 125, "i": "\"Fuckin NeiGhbours\"\nSomE KinD of weird\nShiT......\n\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\n\"\"\"PhreneTiC\"\"\"\n::::::05/95:::::::\n***DA_LAmA***\n(((\\\\PhreneTiC//)))\n  )))//DA_LAmA\\\\(((\n   ----ProDuZA----\n\"\"\"\"TaKe iT\"\"\"\"\n    \"\"Or TaKe iT\"\"\"\nGreeeTzzz\n//To  My  DA_LAmA\\\n)))))))((BuDieS)))(((("}, {"f": "physica.xm", "n": "PHYSICA.XM", "t": "PhySyCaL MaDdDnEs", "a": "Phrenetic", "y": 1996, "d": "23-01-96", "s": 754340, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 135, "i": "grgehgjrssthhh, godv..\nShiT,ik vertel 't zO >\n  PhreNeTiC prEss...\n  PhYsiCaL MadDdneSS\nThE FreaKin OutPuT\nOfF A UmaN's MinD.....\n>kLOte bAAL jE eR ook\naLtijd vaN Je weet wel\nbeN jE neT leUk BeziG\nKom Je toT dE ontDek-\nKinG dAt jE sigaRetTeN\ngEwooN inEens ZoMaaR\noP Zijn...... DamN wat\nBaaL iK DaarVaN.....\nOkee Genoeg SlaP ge-\nOuwekankuhhhoeaaa't\nDiT WaS WeeR eEn uiT-\nsPattiNg VaN:::::.....\n       PhrEneTiC\n          01/95\n DaLaMA    MeM........\n  ****BOZNBNL****\nheLLo 2 All DAlaMa'S\n      TilL  ASaP\n    CCCCCyyyyAAAAA\n======================"}, {"f": "the_feel.xm", "n": "THE_FEEL.XM", "t": "ThE FeeLiNg", "a": "Phrenetic", "y": 1995, "d": "20-05-95", "s": 968345, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 130, "i": "......YoU KnoW........\n\"\"\"$oMeTiMe$\"\"\"\n((( i'vE gOt ThE$e)))\n)))$tRanGe MooD$(((\n  >> ! PhreNetiC ! <<\n (((   DA_LAmA   )))\n=_=Mu$iK MuN$trA=_=\n=_=_19/05/1995_=_=\n=====================\n//// PhreNeTiC\\\\\\\\\n\\\\\\\\GreeTzzzZ////\n////DA_LAmA\\\\\\\\\\\n\\\\\\\\ProDuZiN/////\n////    CreW  \\\\\\\\\\\n===KEEP ON GOING===\n===== DUDE$========="}, {"f": "the_forc.xm", "n": "THE_FORC.XM", "t": "ThE_Force$_Off.....", "a": "Phrenetic", "y": 1995, "d": "15-05-95", "s": 854360, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 10, "bpm": 160, "i": "    ***AnoTheR***\n--->PhreNetiC<---\n   @//EurthShaKeR\\\\@\n,,,,DA_LAmA,,,,\n....MeMBa.............\n///\\\\\\///\\\\\\///\\\\\\///\n\\\\\\///\\\\\\///\\\\\\///\\\\\\/\n(c) 05/95' PhreNetiC..\n....COOOOOLLLLL.....\n //\\\\PhreNetiC//\\\\\n \\\\//DA_LAmA\\\\//\n   =-MuSiC-MaKeR-=\n__==--19__95--==__==--"}];
+</script>
+<script>
+(function(){
+    var ORDER = ['SikeE', 'White Label', 'Weird Ed', 'Phrenetic', 'Necron', 'Freddy Krueger'];
+    var filesEl = document.getElementById('files');
+    var filtersEl = document.getElementById('filters');
+    var current = 'ALL';
+
+    function kb(n){ return Math.round(n / 1024) + 'K'; }
+    function esc(s){ var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    /* filter buttons */
+    function addFilter(name, count){
+        var b = document.createElement('button');
+        b.innerHTML = esc(name.toUpperCase()) + ' <span class="cnt">' + count + '</span>';
+        b.setAttribute('aria-pressed', name === current ? 'true' : 'false');
+        if (name === current) b.className = 'on';
+        b.addEventListener('click', function(){ current = name; render(); });
+        filtersEl.appendChild(b);
+    }
+
+    function render(){
+        filtersEl.innerHTML = '';
+        addFilter('ALL', MODS.length);
+        ORDER.forEach(function(a){ addFilter(a, MODS.filter(function(m){ return m.a === a; }).length); });
+
+        var list = MODS.filter(function(m){ return current === 'ALL' || m.a === current; })
+                       .sort(function(x, y){ return (x.y - y.y) || x.d.split('-').reverse().join('').localeCompare(y.d.split('-').reverse().join('')); });
+        var html = '', year = null;
+        list.forEach(function(m){
+            if (m.y !== year){
+                if (year !== null) html += '</div>';
+                year = m.y;
+                html += '<div class="year"><span class="ln">&#9472;&#9472;&#9472;</span> ' + year + ' <span class="ln">&#9472;&#9472;&#9472;</span></div><div class="flist">';
+            }
+            var idx = MODS.indexOf(m);
+            html += '<div class="frow" data-i="' + idx + '">'
+                 +   '<button class="play" data-act="play">&#9658; PLAY</button>'
+                 +   '<span class="fn">' + esc(m.n) + '</span>'
+                 +   '<span class="sz">' + kb(m.s) + '</span>'
+                 +   '<span class="dt">' + m.d + '</span>'
+                 +   '<span class="ti">' + esc(m.t) + '</span>'
+                 +   '<span class="ar">' + esc(m.a) + '</span>'
+                 +   '<button data-act="info" aria-expanded="false">INFO</button>'
+                 +   '<a class="dl" href="mods/' + m.f + '" download="' + esc(m.n) + '">DL</a>'
+                 +   '<div class="finfo"><span class="meta">' + esc(m.tr) + ' &middot; ' + (m.ch || '?') + ' CHANNELS &middot; ' + m.bpm + ' BPM</span>' + esc(m.i || '(no texts in this one)') + '</div>'
+                 + '</div>';
+        });
+        if (year !== null) html += '</div>';
+        filesEl.innerHTML = html;
+        markPlaying();
+    }
+
+    filesEl.addEventListener('click', function(e){
+        var btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        var row = btn.closest('.frow');
+        var m = MODS[+row.getAttribute('data-i')];
+        if (btn.getAttribute('data-act') === 'info'){
+            var open = row.classList.toggle('open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        } else {
+            if (playing === m && !paused) stop(); else play(m);
+        }
+    });
+
+    /* ---------- player (libopenmpt via chiptune3) ---------- */
+    var player = null, ready = null, playing = null, paused = false, t0 = 0, acc = 0, timer = null;
+    var np = document.getElementById('np'), npWhat = document.getElementById('npWhat'),
+        npTime = document.getElementById('npTime'), npPause = document.getElementById('npPause');
+
+    function on(obj, name, cb){
+        try { if (typeof obj[name] === 'function') obj[name](cb); else obj[name] = cb; }
+        catch(e){ obj[name] = cb; }
+    }
+
+    function getPlayer(){
+        if (ready) return ready;
+        ready = new Promise(function(resolve, reject){
+            var srcs = ['https://cdn.jsdelivr.net/npm/chiptune3@0.8.9/chiptune3.js',
+                        'https://drsnuggles.github.io/chiptune/chiptune3.js'];
+            function tryNext(i){
+                if (i >= srcs.length){ reject(new Error('player not available')); return; }
+                import(srcs[i]).then(function(mod){
+                    var P = new mod.ChiptuneJsPlayer();
+                    var done = false;
+                    on(P, 'onInitialized', function(){ if (!done){ done = true; player = P; resolve(P); } });
+                    on(P, 'onEnded', function(){ stop(); });
+                    on(P, 'onError', function(){ status('PLAYBACK ERROR. TRY ANOTHER TRACK OR DOWNLOAD IT.'); });
+                    setTimeout(function(){ if (!done){ done = true; player = P; resolve(P); } }, 4000);
+                }).catch(function(){ tryNext(i + 1); });
+            }
+            tryNext(0);
+        });
+        return ready;
+    }
+
+    function status(txt){ npWhat.textContent = txt; np.classList.add('on'); document.body.classList.add('np-on'); }
+
+    function tick(){
+        var s = Math.floor((acc + (paused ? 0 : Date.now() - t0)) / 1000);
+        npTime.textContent = (s / 60 < 10 ? '0' : '') + Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
+    }
+
+    function play(m){
+        if (playing === m && paused){ player.unpause ? player.unpause() : player.togglePause(); paused = false; t0 = Date.now(); npPause.textContent = 'PAUSE'; markPlaying(); return; }
+        playing = m; paused = false;
+        status('LOADING PLAYER...');
+        markPlaying();
+        getPlayer().then(function(p){
+            if (playing !== m) return;
+            try { p.stop(); } catch(e){}
+            try { if (p.setRepeatCount) p.setRepeatCount(0); } catch(e){}
+            p.load('mods/' + m.f);
+            npWhat.textContent = m.t + ' \u2014 ' + m.a + ' (' + m.n + ')';
+            acc = 0; t0 = Date.now(); npPause.textContent = 'PAUSE';
+            clearInterval(timer); timer = setInterval(tick, 500); tick();
+        }).catch(function(){
+            status('PLAYER COULD NOT LOAD. YOU CAN STILL DOWNLOAD THE FILE (DL).');
+            playing = null; markPlaying();
+        });
+    }
+
+    function stop(){
+        try { if (player) player.stop(); } catch(e){}
+        playing = null; paused = false;
+        clearInterval(timer);
+        np.classList.remove('on'); document.body.classList.remove('np-on');
+        markPlaying();
+    }
+
+    var npStop = document.getElementById('npStop');
+    npStop.addEventListener('click', stop);
+    npPause.addEventListener('click', function(){
+        if (!player || !playing) return;
+        if (paused){ play(playing); return; }
+        try { player.pause ? player.pause() : player.togglePause(); } catch(e){}
+        paused = true; acc += Date.now() - t0; npPause.textContent = 'PLAY'; markPlaying();
+    });
+
+    function markPlaying(){
+        Array.prototype.forEach.call(filesEl.querySelectorAll('.frow'), function(r){
+            var m = MODS[+r.getAttribute('data-i')];
+            var isOn = (m === playing);
+            r.classList.toggle('playing', isOn && !paused);
+            r.querySelector('.play').innerHTML = (isOn && !paused) ? '&#9632; STOP' : '&#9658; PLAY';
+        });
+    }
+
+    render();
+})();
+</script>
+
+<script src="bbs.js"></script>
+</body>
+</html>
