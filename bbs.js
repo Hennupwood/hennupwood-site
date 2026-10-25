@@ -83,7 +83,7 @@ document.head.appendChild(st);
     function frame(){
         sg.fillStyle = '#000';
         sg.fillRect(0, 0, SW, SH);
-        var speed = 1 + lvl * 2 + boost * 7;
+        var speed = 1 + lvl * 4 + boost * 9;
         for (var i = 0; i < stars.length; i++){
             var s = stars[i];
             if (!still){
@@ -91,12 +91,12 @@ document.head.appendChild(st);
                 if (s.y > SH){ s.y = 0; s.x = Math.random() * SW; }
             }
             var col = s.v > 0.36 ? '#ffffff' : (s.v > 0.22 ? '#aaaaaa' : '#0000aa');
-            if (flash > 0.05 && s.v > 0.18 && (i + beats) % 3 !== 0) col = DISCO[(s.c + beats) % DISCO.length];
+            if ((flash > 0.05 || lvl > 0.55) && s.v > 0.18 && (i + beats) % 3 !== 0) col = DISCO[(s.c + beats) % DISCO.length];
             sg.fillStyle = col;
             var len = (!still && boost > 0.25 && s.v > 0.3) ? 1 + Math.round(boost * 3) : 1;   // little streaks on a hard kick
             sg.fillRect(s.x | 0, s.y | 0, 1, len);
         }
-        boost *= 0.9; flash *= 0.88; lvl *= 0.96;
+        boost *= 0.9; flash *= 0.9; lvl *= 0.92;
     }
     function loop(){ frame(); requestAnimationFrame(loop); }
     window.addEventListener('resize', resize);
