@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="In memory of White Label — Richard Wittebol (17-09-1975, forever 39), Da Lama crew member. His twenty tracker modules, still playing.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>White Label — Richard Wittebol — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.sec{ margin-top:36px; }
+.sec-h{ color:#0066ff; letter-spacing:2px; margin-bottom:10px; }
+.bio{ max-width:760px; line-height:1.8; }
+.bio .accent{ color:#ff00ff; }
+.bio .crew{ color:#ffff00; }
+
+.pattern-wrap{ overflow-x:auto; margin-top:16px; max-width:100%; }
+pre.pattern, pre.diz{
+    margin:0;
+    background:#000;
+    border:1px solid #330044;
+    padding:12px 14px;
+    font-family:"Courier New", monospace;
+    font-size:14px;
+    line-height:1.35;
+    color:#555;
+    white-space:pre;
+    display:inline-block;
+}
+pre.pattern i{ font-style:normal; color:#333; }
+pre.pattern b{ font-weight:normal; }
+pre.pattern .n{ color:#00ffff; }
+pre.pattern .in{ color:#ffff00; }
+pre.pattern .v{ color:#55ff55; }
+pre.pattern .fx{ color:#ff55ff; }
+pre.pattern .rn{ color:#aa00aa; }
+pre.pattern .ch{ color:#0066ff; }
+pre.pattern .sep{ color:#330044; }
+.legend{ margin-top:10px; font-size:13px; line-height:1.8; }
+.legend .n{ color:#00ffff; } .legend .in{ color:#ffff00; } .legend .v{ color:#55ff55; } .legend .fx{ color:#ff55ff; }
+.example{ display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
+pre.diz{ color:#aaaaaa; line-height:1.12; }
+
+.filters{ margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; }
+.filters button{
+    font-family:"Courier New", monospace; font-size:14px;
+    background:#000; color:#00ffff; border:1px solid #aa00aa; padding:5px 10px; cursor:pointer;
+}
+.filters button:hover{ color:#ffff00; }
+.filters button.on{ background:#0000aa; color:#fff; border-color:#ff00ff; }
+.filters .cnt{ color:#ff00ff; }
+.filters button.on .cnt{ color:#ffff00; }
+
+.year{ margin-top:26px; color:#ffff00; letter-spacing:2px; }
+.year .ln{ color:#aa00aa; }
+.flist{ margin-top:6px; }
+.frow{
+    display:grid;
+    grid-template-columns:auto 15ch 6ch 9ch minmax(0,1fr) 15ch auto auto;
+    gap:0 12px;
+    align-items:baseline;
+    padding:4px 6px;
+    border-bottom:1px dotted #1a0022;
+}
+.frow:hover{ background:#05001a; }
+.frow.playing{ background:#0000aa; }
+.frow.playing .fn, .frow.playing .ti{ color:#fff; }
+.frow .fn{ color:#00ffff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.frow .sz{ color:#777; text-align:right; }
+.frow .dt{ color:#777; }
+.frow .ti{ color:#ff00ff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.frow .ar{ color:#aaaaaa; white-space:nowrap; }
+.frow button, .frow a.dl{
+    font-family:"Courier New", monospace; font-size:13px;
+    background:#000; color:#00ffff; border:1px solid #440055; padding:2px 6px; cursor:pointer; white-space:nowrap;
+}
+.frow button:hover, .frow a.dl:hover{ color:#ffff00; border-color:#ff00ff; }
+.frow .play{ color:#ffff00; min-width:7ch; }
+.finfo{
+    display:none;
+    grid-column:1 / -1;
+    margin:8px 0 6px;
+    padding:10px 12px;
+    border-left:2px solid #aa00aa;
+    background:#04000a;
+    color:#aaaaaa;
+    font-size:13px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+.finfo .meta{ color:#0066ff; display:block; margin-bottom:8px; }
+.frow.open .finfo{ display:block; }
+
+@media (max-width:760px){
+    .frow{ grid-template-columns:auto minmax(0,1fr) auto auto; gap:2px 10px; }
+    .frow .sz, .frow .dt{ display:none; }
+    .frow .fn{ grid-column:2; }
+    .frow .ti{ grid-column:2; grid-row:2; }
+    .frow .ar{ grid-column:2; grid-row:3; font-size:13px; }
+    .frow .play{ grid-row:1 / span 3; align-self:center; }
+}
+
+.nowplaying{
+    position:fixed; left:0; right:0; bottom:0; z-index:200;
+    display:none; align-items:center; gap:14px; flex-wrap:wrap;
+    background:#000; border-top:2px solid #aa00aa; box-shadow:0 -6px 18px -6px #8800aa;
+    padding:10px 20px calc(10px + env(safe-area-inset-bottom, 0px));
+    font-family:"Courier New", monospace; font-size:15px;
+}
+.nowplaying.on{ display:flex; }
+.nowplaying .lbl{ color:#ff00ff; }
+.nowplaying .what{ color:#ffff00; flex:1; min-width:12ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.nowplaying .time{ color:#00ffff; }
+.nowplaying button{
+    font-family:"Courier New", monospace; font-size:14px;
+    background:#000; color:#00ffff; border:1px solid #aa00aa; padding:4px 12px; cursor:pointer;
+}
+.nowplaying button:hover{ color:#ffff00; }
+body.np-on .footer{ padding-bottom:70px; }
+.vu{ display:none; flex-direction:column; gap:3px; line-height:1; }
+.vu.on{ display:flex; }
+.vu .row{ display:flex; align-items:center; gap:2px; }
+.vu .ch{ color:#aa00aa; font-size:11px; width:1.2ch; margin-right:4px; }
+.vu .seg{ width:7px; height:7px; background:#111; }
+.vu .seg.g.lit{ background:#55ff55; }
+.vu .seg.y.lit{ background:#ffff55; }
+.vu .seg.r.lit{ background:#ff5555; }
+.vu .seg.g{ background:#0a2a0a; }
+.vu .seg.y{ background:#2a2a0a; }
+.vu .seg.r{ background:#2a0a0a; }
+@media (max-width:600px){ .vu .seg{ width:5px; } }
+
+
+
+.tribute{ display:flex; flex-wrap:wrap; gap:28px; align-items:flex-start; margin-top:10px; }
+.tribute .photo{
+    width:228px; max-width:100%; height:auto;
+    border:12px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+}
+.tribute .who{ flex:1; min-width:260px; }
+.tribute .name{ color:#ffff00; font-size:20px; letter-spacing:2px; }
+.tribute .real{ color:#ff00ff; margin-top:4px; letter-spacing:1px; }
+.tribute .dates{ color:#777; margin-top:8px; }
+.quotes{ margin-top:14px; max-width:760px; line-height:2; }
+.quotes .q{ color:#00ffff; }
+.quotes .src{ color:#555; font-size:13px; }
+.signoff{ margin-top:34px; color:#ffff00; letter-spacing:1px; }
+.signoff .dim{ color:#777; }
+#filters{ display:none; }
+</style>
+</head>
+
+<body data-page="whitelabel">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+IN MEMORY OF
+</div>
+
+<div class="tribute">
+    <img class="photo" src="white-label.png" alt="Richard Wittebol, pointing at the camera with a grin">
+    <div class="who">
+        <div class="name">WHITE LABEL</div>
+        <div class="real">RICHARD WITTEBOL</div>
+        <div class="dates">17-09-1975 &middot; FOREVER 39</div>
+        <br>
+        <div>CREW.............. DA LAMA / JUICE</div>
+        <div>TRACKS............ 20</div>
+        <div>STATUS............ <span class="yellow">STILL ONLINE</span></div>
+    </div>
+</div>
+
+<div class="sec">
+    <div class="ansi-line"></div>
+    <div class="bio">
+        <p><span class="accent">Richard Wittebol</span> was <span class="crew">White Label</span>: part of
+        <span class="accent">JUICE</span> and of <span class="accent">DA LAMA</span>, and with twenty tracks the one who made
+        the most music in this whole collection &mdash; from &ldquo;ol&rsquo;fashion hardcore&rdquo; to monotone trance.</p>
+        <p>He signed his work in his own way &mdash; <span class="crew">WhîTε £ab≡£</span> &mdash; and filled the sample names
+        with jokes, shout-outs and messages to the crew. Those messages are still in the files. And so is he:
+        every track below plays exactly the way he left it.</p>
+    </div>
+    <div class="quotes">
+        <div class="sec-h">[ IN HIS OWN WORDS ]</div>
+        <div><span class="q">&ldquo;Check me CYBA_SPOT: SpYcO&rsquo;s BBS&rdquo;</span> <span class="src">&mdash; Cerebral Cortex, 1995</span></div>
+        <div><span class="q">&ldquo;No Fuzzzz... Just ol&rsquo;fashion HardCore&rdquo;</span> <span class="src">&mdash; Quick, Fast and in a Hurry, 1995</span></div>
+        <div><span class="q">&ldquo;Aah mY ReSpeCTz aRE ViBiNG out to all me Da LaMa Compagnion LamaZz&rdquo;</span> <span class="src">&mdash; Monotoned Chaos, 1995</span></div>
+        <div><span class="q">&ldquo;You don&rsquo;t always know who&rsquo;s right, but you always know who is in &lsquo;Charge&rsquo;.&rdquo;</span> <span class="src">&mdash; Glowing Whispers, 1996</span></div>
+        <div><span class="q">&ldquo;Me am outha here...&rdquo;</span> <span class="src">&mdash; Cerebral Cortex, 1995</span></div>
+    </div>
+</div>
+
+<div class="sec">
+    <div class="sec-h">[ THE TRACKS OF WHITE LABEL ]</div>
+    <div class="ansi-line"></div>
+    <div class="bio">Press <span class="crew">PLAY</span> to listen right here, <span class="crew">INFO</span> for the
+    texts the makers hid in the sample names, or <span class="crew">DL</span> to download the original file.</div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by maker"></div>
+    <div id="files"></div>
+</div>
+
+<div class="signoff">WhîTε £ab≡£ <span class="dim">...</span> still here.</div>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="mods.html">BACK TO MOD AREA</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<div class="nowplaying" id="np" role="region" aria-label="Now playing">
+    <span class="lbl">&#9658; NOW PLAYING</span>
+    <span class="what" id="npWhat"></span>
+    <div class="vu" id="vu" aria-hidden="true"></div>
+    <span class="time" id="npTime">00:00</span>
+    <button id="npPause">PAUSE</button>
+    <button id="npStop">STOP</button>
+</div>
+
+<script>
+/* VU meter: two ANSI-style bars, left and right */
+window.HWVU = (function(){
+    var SEGS = 16, el = document.getElementById('vu');
+    var bars = [], an = [], buf = null, raf = null, peaks = [0, 0], holds = [0, 0], levels = [0, 0];
+    ['L', 'R'].forEach(function(name){
+        var row = document.createElement('div'); row.className = 'row';
+        row.innerHTML = '<span class="ch">' + name + '</span>';
+        var segs = [];
+        for (var i = 0; i < SEGS; i++){
+            var s = document.createElement('span');
+            s.className = 'seg ' + (i < 10 ? 'g' : i < 13 ? 'y' : 'r');
+            row.appendChild(s); segs.push(s);
+        }
+        el.appendChild(row); bars.push(segs);
+    });
+
+    function attach(ctx, node){
+        try {
+            var split = ctx.createChannelSplitter(2);
+            node.connect(split);
+            for (var c = 0; c < 2; c++){
+                var a = ctx.createAnalyser();
+                a.fftSize = 1024; a.smoothingTimeConstant = 0;
+                split.connect(a, c);
+                an.push(a);
+            }
+            buf = new Float32Array(an[0].fftSize);
+            return true;
+        } catch(e){ an = []; return false; }
+    }
+
+    var lastBeat = 0, fbuf = null, prevMag = null, hist = [];
+    function frame(){
+        var energy = 0;
+        for (var c = 0; c < 2; c++){
+            an[c].getFloatTimeDomainData(buf);
+            var sum = 0;
+            for (var i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+            var rms = Math.sqrt(sum / buf.length);
+            energy += rms / 2;
+            var db = 20 * Math.log10(rms + 1e-6);              // about -60 .. 0 dB
+            var target = Math.max(0, Math.min(1, (db + 42) / 40));
+            levels[c] = target > levels[c] ? target : levels[c] * 0.9 + target * 0.1;   // fast up, slow down
+            var lit = Math.round(levels[c] * SEGS);
+            if (lit >= peaks[c]){ peaks[c] = lit; holds[c] = 30; } else if (--holds[c] <= 0){ peaks[c] = Math.max(0, peaks[c] - 1); holds[c] = 3; }
+            for (var s = 0; s < SEGS; s++){
+                bars[c][s].classList.toggle('lit', s < lit || (s === peaks[c] - 1 && peaks[c] > 0));
+            }
+        }
+        /* disco stars: kick detection with spectral flux on the low end.
+           It compares each frame with the last ~0.6 s, so it keeps working when a track gets louder or busier. */
+        if (window.HWSTARS){
+            if (!fbuf){ fbuf = new Float32Array(an[0].frequencyBinCount); prevMag = new Float32Array(16); }
+            an[0].getFloatFrequencyData(fbuf);
+            var hz = an[0].context.sampleRate / an[0].fftSize, flux = 0;
+            for (var k = 1; k < 16 && k * hz < 180; k++){
+                var mag = Math.pow(10, fbuf[k] / 20);
+                var d = mag - prevMag[k];
+                if (d > 0) flux += d;
+                prevMag[k] = mag;
+            }
+            hist.push(flux); if (hist.length > 36) hist.shift();
+            var mean = 0, sd = 0;
+            for (var h = 0; h < hist.length; h++) mean += hist[h];
+            mean /= hist.length;
+            for (h = 0; h < hist.length; h++) sd += (hist[h] - mean) * (hist[h] - mean);
+            sd = Math.sqrt(sd / hist.length);
+            var now = performance.now();
+            var sens = now - lastBeat > 1500 ? 0.9 : 1.4;         // nothing for a while? listen more closely
+            HWSTARS.level((levels[0] + levels[1]) / 2);
+            if (hist.length > 12 && flux > mean + sens * sd && flux > 1e-4 && now - lastBeat > 170){
+                lastBeat = now;
+                HWSTARS.beat(Math.min(1, 0.5 + (flux - mean) / (sd * 4 + 1e-9)));
+            }
+        }
+        raf = requestAnimationFrame(frame);
+    }
+
+    function start(){ if (!an.length) return; el.classList.add('on'); if (!raf) frame(); }
+    function stop(){
+        if (raf){ cancelAnimationFrame(raf); raf = null; }
+        levels = [0, 0]; peaks = [0, 0];
+        bars.forEach(function(segs){ segs.forEach(function(s){ s.classList.remove('lit'); }); });
+    }
+    return { attach:attach, start:start, stop:stop, ready:function(){ return an.length > 0; } };
+})();
+</script>
+<script>
+var MODS = [{"f": "dl_chaos.s3m", "n": "DL_CHAOS.S3M", "t": "Monotoned ChaOs", "a": "White Label", "y": 1995, "d": "29-05-95", "s": 225060, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "===========================\n\n Me am gettin' fed up with\n  da F*t*r* Cr*w's ST.\n Somebody ... PLEASE...,\n   send me 500 Bucks so me\n can buy another F*ckin'\n   board. And then I can\n finally make MUSIC instead\n  of S3M's on Tr*T*N's FT.\n\n           YA DIG ?\n===========================\n\n * Software Piracy's Censur\n===========================\n\n Aah mY ReSpeCTz\n\n aRE ViBiNG out to all me\n  Da LaMa Compagnion LamaZz\n\n===========================\n\n Aaj noow itsa riemiks bat\n noowan hes dannit laajk\n dis.\n\n        WhîTε £ab≡£..."}, {"f": "dl_cort.s3m", "n": "DL_CORT.S3M", "t": "CeReBraL CoRTeX", "a": "White Label", "y": 1995, "d": "14-03-95", "s": 236510, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 122, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\nYezzzzz....\n    Another CYBA_JAM ....\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nby:\n    -=≡ WhîTε £ab≡£ ≡=-\n\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\nYa'll godda check\n       me CYBA_SPOT:\n\n       SpYcO's BBS\n      (#XXXXX-XXXXX)\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nGREETZZZZ go out 2 all me\n         Cyba_Punks\n            o f\n       -=≡ JUICE ≡=-\n\nRESPECT for\n   DA CANNABOID EXPERIENCE\n.... you guys are doin a\n               good job....\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\nMe am outha here..........."}, {"f": "dl_glow.xm", "n": "DL_GLOW.XM", "t": "Glowing Whispers", "a": "White Label", "y": 1996, "d": "20-01-96", "s": 797662, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 130, "i": " Influenza ......\n    it's Killin' me\n\n Thanx a lot man !!!!\n next time put a\n  rubber on ya nose\nwhen ya talk to me Man\n\n       ========\n\nYou don't always\n    know who's right,\nBut you always know\n  who is in \"Charge\".\n\nWhite Label ========\n=========DaLaMaZz.."}, {"f": "dl_hard.xm", "n": "DL_HARD.XM", "t": "7 : 45", "a": "White Label", "y": 1996, "d": "20-08-96", "s": 419955, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 150, "i": "       Its Hard\n     White Label\n     D A L A M A\n\n   D  A  l  A  M  A\n\n      Very Hard"}, {"f": "dl_hyper.xm", "n": "DL_HYPER.XM", "t": "HyPeRZz", "a": "White Label", "y": 1996, "d": "24-01-96", "s": 1276809, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 110, "i": "   Tranquilized\n     under extreme\n  pressure ......\n\n  Fuck it ... fuck 'm\n  all ...\n\n  The hard center\n\n  still contineous ...\n\n   .... DaLaMaZz\n\n     White Label\n\n       23/01/96"}, {"f": "dl_immor.s3m", "n": "DL_IMMOR.S3M", "t": "Immortality", "a": "White Label", "y": 1995, "d": "24-04-95", "s": 294688, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n blablabla\n      lalalala\n            etc.\n\n Play diz MF. with CubiC\n and add da following\n parathing to da command\n line to give ya mods\n a REAL fine sound:\n\n c:\\cubic>\n\n cp -vp100,a200,ecathedral\n\n Respect to all me\n    -=≡ JUICE ≡=-\n  compagnion lamaS\n\n See SpYcO or X for CubiC\n\n       .....till next time.\n\n       WhîTε £ab≡£\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-"}, {"f": "dl_last.s3m", "n": "DL_LAST.S3M", "t": "Da last 70 weeks", "a": "White Label", "y": 1995, "d": "31-05-95", "s": 111860, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": " For those who understand:\n BEWARE !! Course we al-\n ready had an earthquake in\n Greece. Nostrawarningz !!\n No way to stop it,\n  It's da Law !!\n\n       WhîTε £ab≡£/Da LamaS"}, {"f": "dl_loss.s3m", "n": "DL_LOSS.S3M", "t": "Lost in X2C", "a": "White Label", "y": 1995, "d": "12-04-95", "s": 168856, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "\\the undertaker/"}, {"f": "dl_machi.xm", "n": "DL_MACHI.XM", "t": "DaLaMachine", "a": "White Label", "y": 1994, "d": "11-06-94", "s": 1110144, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 213, "i": ""}, {"f": "dl_mag.xm", "n": "DL_MAG.XM", "t": "Underwater Magic", "a": "White Label", "y": 1994, "d": "27-06-94", "s": 1022592, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 140, "i": "White Label\\DaLaMaZ\n\nAugusta\\1995"}, {"f": "dl_mind.s3m", "n": "DL_MIND.S3M", "t": "OfF_BeaT MiNd_F#Ck", "a": "White Label", "y": 1995, "d": "22-05-95", "s": 215696, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "===========================\n Don'T Ya LuvThem oFFbeATs\n\n WaTchiT ! Da OffBeaT_PaRT\n         is FreakY\n\n Or something Li|<e That\n===========================\n messy 4 Altar:\n\n dear Altar,\n\n HURRY DA FUCK UP !!!!!!!\n===========================\n\n GreeTZz to Grunninguh\n      to da Whole\n  Carlos'Crew\n        and his SISTA !!!\n\n===========================\n\n Special greeTZz to SikeE,\n NeCroN, Viper/StraNiX/...,\n L.S. Weard EttePeT, FreDDy\n , and all da rest of them\n  -=JuiCe=- Lamas\n\n===========================\n\n WhîTε £ab≡£ signin' off..."}, {"f": "dl_monda.s3m", "n": "DL_MONDA.S3M", "t": "Monday Mornings", "a": "White Label", "y": 1995, "d": "02-05-95", "s": 121156, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 125, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n  _-=≡ JuiCe Da LamaS ≡=-_\n\n          presents\n\n       Monday Mornings\n\n             by\n\n   _-=≡ WhîTε £ab≡£ ≡=-_\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n Ps.  Me was FlinstoneD\n      last MelloW_PartY\n      HOW bout you\n      SpYcO and X ?\n      Hope Ya survived\n      that F*cking Monday."}, {"f": "dl_osmo.s3m", "n": "DL_OSMO.S3M", "t": "Osmosis", "a": "White Label", "y": 1995, "d": "26-04-95", "s": 161513, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 106, "i": " Osmosisssssssssssssssss\n      Da hard version ..\n\n Another JuiCe_Track\n          by\n      WhîTε £ab≡£\n\n Rememba only play diz\n  with CubiC_Player\n\n and add da following\n parameter to da CP command\n\n -vp100,a250,ecathedral\n\n ! But SpYcO did already\n   know....X didn't      !\n\n       .... till next s3m."}, {"f": "dl_perso.xm", "n": "DL_PERSO.XM", "t": "No Personality", "a": "White Label", "y": 1995, "d": "29-06-95", "s": 1202292, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 20, "bpm": 160, "i": "Nameless song i think.\nEhm No PeRsoNaLiTy\nSo be free and Xplore.\nGreetZ NeCroN\n\nAnd To All Da LaMa\nDuDeZ... Yoho! All !!!"}, {"f": "dl_punch.xm", "n": "DL_PUNCH.XM", "t": "EtErNaL PuNNiSHmeNT", "a": "White Label", "y": 1995, "d": "13-04-95", "s": 214223, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 16, "bpm": 125, "i": "≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n   DIZ ONE GOES OUT 4\n          PUNNISHER\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n\nYezzz..\nAnother DOPE-DEF-JAM\n       by WhîTε £aB≡£\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\nGreetz go out to all m\n           of\n        -=JUICE=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n\n  Check me CYBA-SPOT:\n\n      SpYcO 's BBS\n      (#XXXXX-XXXXX)\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n\nSiKe.....without you I\n\n      ... you know it\n\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n-=≡=-=≡=-=≡=-=≡=-=≡=-=\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=\n-=≡=-=≡=-=≡=-=≡=-=≡=-="}, {"f": "dl_quik.s3m", "n": "DL_QUIK.S3M", "t": "Quick, Fast and in a Hurry.", "a": "White Label", "y": 1995, "d": "17-03-95", "s": 330876, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 115, "i": "≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nNo Fuzzzz.....\n...Just ol'fashion HardCore\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\nBy:\n        WhîTε £ab≡£\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nCheck me CYBA_SPOT:\n\n        SpYcO's BBS\n       (#XXXXX-XXXXX)\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\nGreetzzzz to all me\n        -=≡JUICE≡=-\n           compagnionzzz...\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n               ... Da Lamas\n\n             ∞"}, {"f": "dl_smart.xm", "n": "DL_SMART.XM", "t": "SmarTaniA", "a": "White Label", "y": 1994, "d": "23-05-94", "s": 620254, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 18, "bpm": 128, "i": " Da feelin is back ...\n\n A U4ian feelin called\n\n    Smartania.......\n\nDiz. is NOT a real .XM\n .diz is a Tracked s3M\nI fucked it up but I\nrealease thiz Mutha..\nanyway coz me spend\n4 fuckin weeks on it !\n GreeTZz to all DaLama\n Compagnion LamaZz ...\n GreetZz to Grunninguh\n L.S.- D. and SmartY\n Hooligan P. and TefaL\n BAS TOoNEN ,HetKurt\n and all da rest of da\n Fuckin Freaks.\n\n For now... Playboy\n rules... (NOT)\n  So does Da LaMaZz\n\n  ==  White Label ==\nShit no ascii .....\nPlay in FT cause Cubic\nsux with .diz track !"}, {"f": "dl_sound.xm", "n": "DL_SOUND.XM", "t": "Sound", "a": "White Label", "y": 1996, "d": "28-08-96", "s": 833640, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 12, "bpm": 130, "i": "DaLaMaZz\nWhite Label\nsampz by Bachelor Fish\nhis MC303\nNew Sounds ....\n   ... so good ."}, {"f": "dl_time.s3m", "n": "DL_TIME.S3M", "t": "4 Da Old Times   (HakkuH)", "a": "White Label", "y": 1995, "d": "05-04-95", "s": 322828, "fmt": "S3M", "tr": "ScreamTracker 3", "ch": 16, "bpm": 111, "i": "-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n Diz 1 Goes out 4 Doze That\n Can Recall da Immortality\n Party on 28 AUG. 1993\n Hall 1 was really HaKKuH\n ....... Rememba ?\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n Special Greetz 4 me\n   --==≡≡JUICE≡≡==--\n      compagnions\n\n         .... Da Lamas --))\n\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n\n Ya'll Godda Check our\n        Cyba_Spot\n       SpYcO's BBS\n      (#XXXXX-XXXXX)\n\n≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-\n-=≡=-=≡=-=≡=-=≡=-=≡=-=≡=-=≡\n\n WhîTε £ab≡£ says:\n     MIEJEMOUTOFEER .....?"}, {"f": "dl_tranz.xm", "n": "DL_TRANZ.XM", "t": "T R A N Z I N G  X", "a": "White Label", "y": 1996, "d": "04-06-96", "s": 1216261, "fmt": "XM", "tr": "FastTracker v2.00", "ch": 24, "bpm": 170, "i": "   W H I T E L A B E L\n           dalama\n       EverGiving X\n\nfor a smashing x party\n       I never had the\n            chance\n         D A L A M A"}];
+</script>
+<script>
+(function(){
+    var ORDER = ['SikeE', 'White Label', 'Weird Ed', 'Phrenetic', 'Necron', 'Freddy Krueger'];
+    var filesEl = document.getElementById('files');
+    var filtersEl = document.getElementById('filters');
+    var current = 'White Label';
+
+    function kb(n){ return Math.round(n / 1024) + 'K'; }
+    function esc(s){ var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    /* filter buttons */
+    function addFilter(name, count){
+        var b = document.createElement('button');
+        b.innerHTML = esc(name.toUpperCase()) + ' <span class="cnt">' + count + '</span>';
+        b.setAttribute('aria-pressed', name === current ? 'true' : 'false');
+        if (name === current) b.className = 'on';
+        b.addEventListener('click', function(){ current = name; render(); });
+        filtersEl.appendChild(b);
+    }
+
+    function render(){
+        filtersEl.innerHTML = '';
+        addFilter('ALL', MODS.length);
+        ORDER.forEach(function(a){ addFilter(a, MODS.filter(function(m){ return m.a === a; }).length); });
+
+        var list = MODS.filter(function(m){ return current === 'ALL' || m.a === current; })
+                       .sort(function(x, y){ return (x.y - y.y) || x.d.split('-').reverse().join('').localeCompare(y.d.split('-').reverse().join('')); });
+        var html = '', year = null;
+        list.forEach(function(m){
+            if (m.y !== year){
+                if (year !== null) html += '</div>';
+                year = m.y;
+                html += '<div class="year"><span class="ln">&#9472;&#9472;&#9472;</span> ' + year + ' <span class="ln">&#9472;&#9472;&#9472;</span></div><div class="flist">';
+            }
+            var idx = MODS.indexOf(m);
+            html += '<div class="frow" data-i="' + idx + '">'
+                 +   '<button class="play" data-act="play">&#9658; PLAY</button>'
+                 +   '<span class="fn">' + esc(m.n) + '</span>'
+                 +   '<span class="sz">' + kb(m.s) + '</span>'
+                 +   '<span class="dt">' + m.d + '</span>'
+                 +   '<span class="ti">' + esc(m.t) + '</span>'
+                 +   '<span class="ar">' + esc(m.a) + '</span>'
+                 +   '<button data-act="info" aria-expanded="false">INFO</button>'
+                 +   '<a class="dl" href="mods/' + m.f + '" download="' + esc(m.n) + '">DL</a>'
+                 +   '<div class="finfo"><span class="meta">' + esc(m.tr) + ' &middot; ' + (m.ch || '?') + ' CHANNELS &middot; ' + m.bpm + ' BPM</span>' + esc(m.i || '(no texts in this one)') + '</div>'
+                 + '</div>';
+        });
+        if (year !== null) html += '</div>';
+        filesEl.innerHTML = html;
+        markPlaying();
+    }
+
+    filesEl.addEventListener('click', function(e){
+        var btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        var row = btn.closest('.frow');
+        var m = MODS[+row.getAttribute('data-i')];
+        if (btn.getAttribute('data-act') === 'info'){
+            var open = row.classList.toggle('open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        } else {
+            if (playing === m && !paused) stop(); else play(m);
+        }
+    });
+
+    /* ---------- player (libopenmpt via chiptune3) ---------- */
+    var player = null, ready = null, playing = null, paused = false, t0 = 0, acc = 0, timer = null;
+    var np = document.getElementById('np'), npWhat = document.getElementById('npWhat'),
+        npTime = document.getElementById('npTime'), npPause = document.getElementById('npPause');
+
+    function on(obj, name, cb){
+        try { if (typeof obj[name] === 'function') obj[name](cb); else obj[name] = cb; }
+        catch(e){ obj[name] = cb; }
+    }
+
+    function getPlayer(){
+        if (ready) return ready;
+        ready = new Promise(function(resolve, reject){
+            var srcs = ['https://cdn.jsdelivr.net/npm/chiptune3@0.8.9/chiptune3.js',
+                        'https://drsnuggles.github.io/chiptune/chiptune3.js'];
+            function tryNext(i){
+                if (i >= srcs.length){ reject(new Error('player not available')); return; }
+                import(srcs[i]).then(function(mod){
+                    var P = new mod.ChiptuneJsPlayer();
+                    var done = false;
+                    var hook = function(){
+                        var ctx = P.context || P.audioContext || P.ctx;
+                        var node = P.gain || P.gainNode;
+                        if (ctx && node && !HWVU.ready()) HWVU.attach(ctx, node);
+                    };
+                    on(P, 'onInitialized', function(){ if (!done){ done = true; player = P; hook(); resolve(P); } });
+                    on(P, 'onEnded', function(){ stop(); });
+                    on(P, 'onError', function(){ status('PLAYBACK ERROR. TRY ANOTHER TRACK OR DOWNLOAD IT.'); });
+                    setTimeout(function(){ if (!done){ done = true; player = P; hook(); resolve(P); } }, 4000);
+                }).catch(function(){ tryNext(i + 1); });
+            }
+            tryNext(0);
+        });
+        return ready;
+    }
+
+    function status(txt){ npWhat.textContent = txt; np.classList.add('on'); document.body.classList.add('np-on'); }
+
+    function tick(){
+        var s = Math.floor((acc + (paused ? 0 : Date.now() - t0)) / 1000);
+        npTime.textContent = (s / 60 < 10 ? '0' : '') + Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
+    }
+
+    function play(m){
+        if (playing === m && paused){ player.unpause ? player.unpause() : player.togglePause(); paused = false; t0 = Date.now(); npPause.textContent = 'PAUSE'; markPlaying(); HWVU.start(); return; }
+        playing = m; paused = false;
+        status('LOADING PLAYER...');
+        markPlaying();
+        getPlayer().then(function(p){
+            if (playing !== m) return;
+            try { p.stop(); } catch(e){}
+            try { if (p.setRepeatCount) p.setRepeatCount(0); } catch(e){}
+            p.load('mods/' + m.f);
+            npWhat.textContent = m.t + ' \u2014 ' + m.a + ' (' + m.n + ')';
+            acc = 0; t0 = Date.now(); npPause.textContent = 'PAUSE';
+            clearInterval(timer); timer = setInterval(tick, 500); tick();
+            HWVU.start();
+        }).catch(function(){
+            status('PLAYER COULD NOT LOAD. YOU CAN STILL DOWNLOAD THE FILE (DL).');
+            playing = null; markPlaying();
+        });
+    }
+
+    function stop(){
+        try { if (player) player.stop(); } catch(e){}
+        playing = null; paused = false;
+        clearInterval(timer);
+        HWVU.stop();
+        np.classList.remove('on'); document.body.classList.remove('np-on');
+        markPlaying();
+    }
+
+    var npStop = document.getElementById('npStop');
+    npStop.addEventListener('click', stop);
+    npPause.addEventListener('click', function(){
+        if (!player || !playing) return;
+        if (paused){ play(playing); return; }
+        try { player.pause ? player.pause() : player.togglePause(); } catch(e){}
+        paused = true; acc += Date.now() - t0; npPause.textContent = 'PLAY'; markPlaying();
+        HWVU.stop();
+    });
+
+    function markPlaying(){
+        Array.prototype.forEach.call(filesEl.querySelectorAll('.frow'), function(r){
+            var m = MODS[+r.getAttribute('data-i')];
+            var isOn = (m === playing);
+            r.classList.toggle('playing', isOn && !paused);
+            r.querySelector('.play').innerHTML = (isOn && !paused) ? '&#9632; STOP' : '&#9658; PLAY';
+        });
+    }
+
+    render();
+})();
+</script>
+
+<script src="bbs.js"></script>
+</body>
+</html>
