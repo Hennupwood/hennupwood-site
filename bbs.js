@@ -5,7 +5,7 @@
 /* ---------- where things live ---------- */
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
-    games:'games.html', raid:'raid.html', tower:'tower.html', chess:'chess.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html', videos:'videos.html',
+    games:'games.html', raid:'raid.html', tower:'tower.html', chess:'chess.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html', videos:'videos.html', links:'links.html',
     music:'music.html',
     soundcloud:'https://soundcloud.com/hennupwoodmusic',
     mixcloud:'https://www.mixcloud.com/ronald-van-toledo/',
@@ -15,7 +15,8 @@ var LINKS = {
 
 /* number keys per page, matching the menus on each page */
 var NUMS = {
-    index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins', '8':'mods', '9':'videos' },
+    index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins', '8':'mods', '9':'videos', 'L':'links' },
+    links:    { '0':'main' },
     videos:   { '0':'main' },
     music:    { '0':'main' },
     mods:     { '0':'main' },
@@ -187,6 +188,7 @@ window.HWCOUNT = (function(){
         ['VIDEOS', 'videos.html', ['videos']],
         ['DOORS', 'games.html', ['games', 'raid', 'tower', 'chess']],
         ['BULLETINS', 'bulletins.html', ['bulletins']],
+        ['LINKS', 'links.html', ['links']],
         ['CONTACT', 'contact.html', ['contact']]
     ];
     var navCss = ''
@@ -350,6 +352,7 @@ function run(raw){
             '  MODS          da lama tracker music',
             '  VIDEOS        hennupwood on youtube',
             '  BULLETINS     news from the sysop',
+            '  LINKS         other boards & scene sites',
             '  CONTACT       leave a message for the sysop',
             '  WHO           who is online',
             '  TIME          system time',
@@ -375,6 +378,7 @@ function run(raw){
     case 'MODS': case 'MOD': case 'TRACKS': case 'XM': case 'S3M': go('mods'); return;
     case 'WHITELABEL': case 'WHITE': case 'RICHARD': case 'WL': go('whitelabel'); return;
     case 'VIDEOS': case 'VIDEO': case 'YT': case 'TV': go('videos'); return;
+    case 'LINKS': case 'BOARDS': case 'BBSLIST': go('links'); return;
     case 'RAID': go('raid'); return;
     case 'TOWER': go('tower'); return;
     case 'CHESS': case 'SCHAAK': case 'SCHAKEN': go('chess'); return;

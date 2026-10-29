@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Other boards and scene sites: ANSI art archives, tracker music, BBS lists and more, picked by the Hennupwood sysop.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>Other Boards — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.lsec{ margin-top:30px; }
+.lsec .sec-h{ color:#0066ff; letter-spacing:2px; margin-bottom:8px; }
+.link{
+    display:grid; grid-template-columns:4ch minmax(0,22ch) minmax(0,1fr) auto;
+    gap:4px 14px; align-items:baseline; padding:7px 6px; border-bottom:1px dotted #1a0022;
+}
+.link:hover{ background:#05001a; }
+.link .num{ color:#ff00ff; }
+.link .nm{ color:#00ffff; }
+.link .ds{ color:#999; line-height:1.6; }
+.link a.go{ border:1px solid #440055; padding:2px 8px; font-size:13px; white-space:nowrap; }
+.link a.go:hover{ border-color:#ff00ff; }
+@media (max-width:700px){
+    .link{ grid-template-columns:4ch minmax(0,1fr) auto; }
+    .link .ds{ grid-column:2 / -1; grid-row:2; }
+}
+
+</style>
+</head>
+
+<body data-page="links">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+OTHER BOARDS &amp; SCENE SITES
+</div>
+
+<br>
+
+<div>LINKS............. 7</div>
+<div>PICKED BY......... THE SYSOP</div>
+
+<br>
+
+<div class="cyan">LOADING BBS LIST...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="lsec">
+    <div class="sec-h">[ BOARDS STILL ONLINE ]</div>
+    <div class="ansi-line"></div>
+    <div class="link"><span class="num">[1]</span><span class="nm">ANSIWAVE</span><span class="ds">A modern BBS in full ANSI style, with boards and posts you can read in the browser.</span><a class="go" href="https://bbs.ansiwave.net/bbs/view.html#data:eAHNWMty4jgU3c8vsFHVLLJpEjAOJGFFAt0hJKQ7D5IOC8rGAgR-gC1DyCqL1FQWvUlSxbo_YP5l_oEvmSpZtiVL5lE9UzOUiipb0rn3nvvQlTPtXFnNWeAf_mXaOeu3zH-OnWkXVGu5eMu0C6Wt9Vgrh6L_XC5elosXVgad-Qhm-EmZTuG7-DV9QzfSp2d-_Ewza53mvApy8GeifmwByLTzZTXWUlHKas5aLl5AtCSxI2VQrTPtvEUe1GLA1Eemre6XC0VruXgN4SNVfywXP-TWbmjrR6Zd2CdSy4WStVy88iPQS1GIxLyVUDqY4SaIhgFiwF7kN2G3AEZsfGO5jgSUVbXMhEJIcogu2LbKdmIrDSJFsQiDoQspNLUgX1aLAS2CH0Lx6j595hfmAmoj7Rlf5ihGMBiEnIgUT_yQgEnwIo14qBCdhpCoVGiYLMaYPOWzL8HqCs4jygOPEoQE5bE3yeIiFy2MVWQQaokkgkO1Z83k2Y2emGmGiIRbEzvp2zhMSxEpNNZ5FE5CGpPScreOST6nmAymrEVJwtETcEkNonEjjPfYDW-BNdZy8S4s4wYl5o1N2lQxkQDeZQxYgqwALTL0SJbqa6mKzgk5OQKBVK33aAQJFntcWMHE73tE3BsPITE8nt5sMGI4_yRlpBbLVbm7Mnnpvj-5oHsXOQvCgI6g9jA6xsy9AQkhgN8sIYyDXzuSMjgAIdQ-omrEcklc_szEkJy_NO7STy2hBiwXbx2SqbQKBmWFyak8-0AK6DO_nma6fD93CtNFKevShojOgkk0Zhgj_qAYskZJDMjUcIxLw2skgjsYgrIbnlX7XNwK-om7w4DjKAraAXpmkSna-MQMREdBeLKFGBzA63LxGsW0VARVA4C1OMJIHNHPXF0Lc5ZozbCZFrkhxM8NiKYzQQ3fmOpnHojyGLVMa4RJZ9bTxa4JXBauCZSVRYFQLPjbwcblINqf0DdMCLE6JVekTkiqfKwkicnw9Fotkhbs7TXbFkg6YqLjCNy81gY3Ts41EqK5Q5VRNn0RbQECC8ImKrlCBhmd0-mSN9NtFdAqJZhL4qomiCVxJblrWqlYQ7H3S2kcSVMgawLj9l-Ou15s2LPL2tE1u_l2n0me6JSN745RoLLFj-kpWRLTy0JMKB8ZYQEKdeSqnlAE1RxTsXjjJOuZjXG0bLBDvI6Gmcrf0MR9EtLFG1Jc5pkuk-Vqg16LF0XfRl5nT8qY4tCLiaaHJTS8xq7aIdn0K1JWbRJ7Pubw37ylivFfojbzI-5wEsv4VjjpnjV8x8tYLE6XMLlYOpjpNSfrM9kZXU3Ccye4xYoxmbhGCynMbpP2rvKwY90EBLclejT6jZT7NBDzQ2XSm2fs6JChTZ3McMR_bxDiZX0axrxylkmHZF80E164GNpEg1ablFyZElbyxTTUiNskZP0vPtNv_fsXsP_6wzQ0Dtza82AXI8cmD5Xmdf2u0qqB4-NrgDygARdi18n2fOy7yMOoC3TfNCFGNtAdzTV2wc0AghnUAfLsHQx6vg00e245Ltzd3TUh3vGA7iPTAJ5jQTxAdh9A04O7RBz5O4Uu3PHAbKDhHQ8YqNeDLrQx0HTHxwDho0BNE9kjcOJCDUNQaV7XgeZioNkGuKhX68DyPdQFBnJhF5tzgGwwdjzsgQHGY-9ob0_XvV3N9tBMm8JdG2LyYoAt83c8H8OjsePhT8g4ahzvPxZrZ8MvLdWtfC05_WHtqT5UK6PG-HJufL9AGs4qXvFxcpY1S05FH_UVv5FvNq663-7m_vy0-fDFNFqDQavV-qLPTwuO0fEqs0-EqqNRrdGH10YhW1Jv5zm9d3l5dmgNc5O7QmN8Mb4__uK634zbaf4wV2NMPnadmQcBHsCAcQARHkAXODZ5N4M6cFyAbKABDF0L2Zq5rdX7qHHSULs3h6XKGcw-abeD-vT-3Bl-HiL3vHrZ0IuliTZylLMS9g6f5qO-0pwOH64Lk0IHla6KZh11_cvhSfW6dzxxL4zaBCu16q9ZXXVmtuloBtBsoLndAZpC4PQYFjTbAHpADcLA6fVMZMNtDa_YJcWZVlvjm_tT7ez-pIdunLozPLg5GXyuNp9GFX-a--yfNye3WG2q5y08amnfS9P7k6FuPJi3jZ51YD119Y6jf_Vhx80Xm51Spf9Lhp87fWSDGcIDoAEP9W1k98EIzj8B28FAA74HXVuz4N5Y87yZ4xrb2nzduXzEt3qxZ-r7s9ao5pnVxuWpohg31ULBfzi4Uh97Pso-6sq81Z3rF3fZW7dqwMdBzSvUW1mkjx_OOwfjr_3CXPGv6iNcc_LVb9vb_DcQqMGF,hash:Ym9hcmQ6a0VLZ2VTZDMtNzRVeTBiZk9PSjltajBxVzNLcE1wWEJHcnJRZFV2MTkwRQ" target="_blank" rel="noopener" data-key="1">VISIT &rarr;</a></div>
+    <div class="link"><span class="num">[2]</span><span class="nm">TELNET BBS GUIDE</span><span class="ds">Over a thousand boards that still answer today &mdash; by telnet, and some even by modem.</span><a class="go" href="https://www.telnetbbsguide.com/" target="_blank" rel="noopener" data-key="2">VISIT &rarr;</a></div>
+</div>
+
+<div class="lsec">
+    <div class="sec-h">[ ANSI &amp; ART ]</div>
+    <div class="ansi-line"></div>
+    <div class="link"><span class="num">[3]</span><span class="nm">16COLO.RS</span><span class="ds">The biggest ANSI and ASCII art archive: artpacks from the early nineties until now, by group and by year.</span><a class="go" href="https://16colo.rs/" target="_blank" rel="noopener" data-key="3">VISIT &rarr;</a></div>
+    <div class="link"><span class="num">[4]</span><span class="nm">ROY/SAC</span><span class="ds">Oldskool ANSI and ASCII by a legend: founder of Superior Art Creations, sysop of Closed Society. Galleries, tutorials and history.</span><a class="go" href="https://roysac.com/" target="_blank" rel="noopener" data-key="4">VISIT &rarr;</a></div>
+    <div class="link"><span class="num">[5]</span><span class="nm">DEFACTO2</span><span class="ds">The archive of the digital scene: NFOs, intros, BBS ads and the groups behind them.</span><a class="go" href="https://defacto2.net/" target="_blank" rel="noopener" data-key="5">VISIT &rarr;</a></div>
+</div>
+
+<div class="lsec">
+    <div class="sec-h">[ TRACKER MUSIC ]</div>
+    <div class="ansi-line"></div>
+    <div class="link"><span class="num">[6]</span><span class="nm">THE MOD ARCHIVE</span><span class="ds">Since 1996 the home of tracker music: hundreds of thousands of MOD, S3M, XM and IT files.</span><a class="go" href="https://modarchive.org/" target="_blank" rel="noopener" data-key="6">VISIT &rarr;</a></div>
+</div>
+
+<div class="lsec">
+    <div class="sec-h">[ HISTORY ]</div>
+    <div class="ansi-line"></div>
+    <div class="link"><span class="num">[7]</span><span class="nm">TEXTFILES.COM</span><span class="ds">Old BBS text files, scene history and the BBS Documentary &mdash; the way it really was.</span><a class="go" href="http://www.textfiles.com/" target="_blank" rel="noopener" data-key="7">VISIT &rarr;</a></div>
+</div>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<script src="bbs.js"></script>
+</body>
+</html>
