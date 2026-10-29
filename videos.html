@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Videos by Hennupwood — every upload from the Hennupwood YouTube channel, in one player.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>Videos — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.player{
+    position:relative;
+    margin-top:26px;
+    max-width:860px;
+    aspect-ratio:16 / 9;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+.player iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.facade{
+    position:absolute; inset:0; width:100%; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    background:#000; border:0; cursor:pointer; color:#00ffff;
+    font-family:"Courier New", monospace; font-size:16px; padding:20px; box-sizing:border-box;
+}
+.facade .big{
+    font-size:54px; line-height:1; color:#ffff00;
+    border:3px double #aa00aa; padding:14px 26px 14px 32px; box-shadow:0 0 18px #8800aa;
+}
+.facade:hover .big, .facade:focus .big{ color:#fff; background:#0000aa; }
+.facade .t{ color:#ff00ff; letter-spacing:2px; }
+.facade .s{ color:#666; font-size:13px; }
+.facade:focus{ outline:none; }
+.vnote{ margin-top:16px; line-height:1.8; max-width:760px; }
+
+</style>
+</head>
+
+<body data-page="videos">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+VIDEOS
+</div>
+
+<br>
+
+<div>CHANNEL........... HENNUPWOOD</div>
+<div>SOURCE............ YOUTUBE</div>
+<div>CONTENT........... EVERY UPLOAD, NEWEST FIRST</div>
+
+<br>
+
+<div class="cyan">TUNING IN...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="player" id="player">
+    <button class="facade" id="facade" aria-label="Play the Hennupwood channel">
+        <span class="big">&#9658;</span>
+        <span class="t">PLAY THE HENNUPWOOD CHANNEL</span>
+        <span class="s">loads the YouTube player &middot; use the playlist button in the player to pick a video</span>
+    </button>
+</div>
+
+<div class="vnote">
+    New videos show up here by themselves. Prefer YouTube itself?
+    Go to the <a href="https://www.youtube.com/@hennupwooddalamainstadub8583/videos" target="_blank" rel="noopener">Hennupwood channel</a>.
+</div>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<script>
+(function(){
+    /* The player only loads when someone presses play: faster page, and YouTube sees nobody until then. */
+    var UPLOADS = 'UUStRuVasj0VfBJ2TrHxePBQ';   // all uploads of channel UCStRuVasj0VfBJ2TrHxePBQ
+    document.getElementById('facade').addEventListener('click', function(){
+        var f = document.createElement('iframe');
+        f.src = 'https://www.youtube-nocookie.com/embed/videoseries?list=' + UPLOADS + '&autoplay=1&rel=0';
+        f.title = 'Hennupwood on YouTube';
+        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        var p = document.getElementById('player');
+        p.innerHTML = '';
+        p.appendChild(f);
+        if (window.HWCOUNT) HWCOUNT.event('video/channel-play', 'VIDEOS: channel player');
+    });
+})();
+</script>
+
+<script src="bbs.js"></script>
+</body>
+</html>

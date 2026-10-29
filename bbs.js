@@ -5,7 +5,7 @@
 /* ---------- where things live ---------- */
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
-    games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html',
+    games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html', videos:'videos.html',
     music:'https://soundcloud.com/hennupwoodmusic',
     soundcloud:'https://soundcloud.com/hennupwoodmusic',
     mixcloud:'https://www.mixcloud.com/ronald-van-toledo/',
@@ -15,7 +15,8 @@ var LINKS = {
 
 /* number keys per page, matching the menus on each page */
 var NUMS = {
-    index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins', '8':'mods' },
+    index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins', '8':'mods', '9':'videos' },
+    videos:   { '0':'main' },
     mods:     { '0':'main' },
     whitelabel:{ '0':'mods' },
     contact:  { '0':'main' },
@@ -181,6 +182,7 @@ window.HWCOUNT = (function(){
         ['ABOUT', 'about.html', ['about']],
         ['ANSI ART', 'art.html', ['art']],
         ['MODS', 'mods.html', ['mods', 'whitelabel']],
+        ['VIDEOS', 'videos.html', ['videos']],
         ['DOORS', 'games.html', ['games', 'raid', 'tower']],
         ['BULLETINS', 'bulletins.html', ['bulletins']],
         ['CONTACT', 'contact.html', ['contact']]
@@ -344,6 +346,7 @@ function run(raw){
             '  ANSI ART      the ANSI art archive',
             '  DOORS         door games',
             '  MODS          da lama tracker music',
+            '  VIDEOS        hennupwood on youtube',
             '  BULLETINS     news from the sysop',
             '  CONTACT       leave a message for the sysop',
             '  WHO           who is online',
@@ -368,6 +371,7 @@ function run(raw){
     case 'BULLETINS': case 'BULLETIN': case 'NEWS': case 'B': go('bulletins'); return;
     case 'MODS': case 'MOD': case 'TRACKS': case 'XM': case 'S3M': go('mods'); return;
     case 'WHITELABEL': case 'WHITE': case 'RICHARD': case 'WL': go('whitelabel'); return;
+    case 'VIDEOS': case 'VIDEO': case 'YT': case 'TV': go('videos'); return;
     case 'RAID': go('raid'); return;
     case 'TOWER': go('tower'); return;
     case 'CONTACT': case 'MAIL': case 'E': go('contact'); return;
