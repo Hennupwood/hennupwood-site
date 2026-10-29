@@ -374,6 +374,11 @@ window.HWCOUNT = (function(){
         a.innerHTML = '<span class="br">[</span>' + it[0] + '<span class="br">]</span>';
         nav.appendChild(a);
     });
+    var tb = document.createElement('a');
+    tb.href = '#'; tb.title = 'Open the terminal (F2)';
+    tb.innerHTML = '<span class="br">[</span>&gt;_<span class="br">]</span>';
+    tb.addEventListener('click', function(e){ e.preventDefault(); if (window.HWBBS) HWBBS.openTerm(); });
+    nav.appendChild(tb);
     logo.parentNode.insertBefore(nav, logo.nextSibling);
     logo.style.marginBottom = '0';
     var box = document.querySelector('.box');
@@ -416,7 +421,9 @@ input.addEventListener('keyup', function(e){ e.stopPropagation(); });
 
 
 /* ---------- output ---------- */
+var termPrinter = null;
 function print(text, cls){
+    if (termPrinter){ termPrinter(text, cls); return; }
     var d = document.createElement('div');
     d.className = cls || 'l-ok';
     d.textContent = text;
@@ -485,13 +492,14 @@ function rainbow(){
 /* ---------- commands ---------- */
 var uptimeYears = new Date().getFullYear() - 1995;
 
-function run(raw){
+function run(raw, fromTerm){
+    if (!fromTerm) termPrinter = null;
     var cmd = raw.toUpperCase().replace(/\s+/g, ' ').trim();
-    if (!cmd) return;
-    print('COMMAND > ' + cmd, 'l-cmd');
+    if (!cmd) return true;
+    if (!fromTerm) print('COMMAND > ' + cmd, 'l-cmd');
 
     var nums = NUMS[page] || {};
-    if (nums[cmd]){ go(nums[cmd]); return; }
+    if (nums[cmd]){ go(nums[cmd]); return true; }
 
     var w = cmd.split(' ')[0];
 
@@ -514,6 +522,7 @@ function run(raw){
             '  WHO           who is online',
             '  TIME          system time',
             '  VER           system version',
+            '  TERM          open the terminal (or F2)',
             '  CLS           clear the screen',
             '  BYE           log off',
             '═══════════════════════════════════════════'
@@ -587,6 +596,8 @@ function run(raw){
         if (window.HWSTARS && HWSTARS.nova()) print('SUPERNOVA DETECTED. LOOK NEXT TO THE BOARD.', 'l-hi');
         else print('NO ROOM IN THE SKY RIGHT NOW. SCROLL A BIT AND TRY AGAIN.', 'l-ok');
         return;
+    case 'TERM': case 'TERMINAL': case 'CMD': case 'SHELL':
+        openTerm(); return;
     case 'XYZZY':
         print('NOTHING HAPPENS.', 'l-ok'); return;
     case 'SYSOP': case 'PAGE': case 'CHAT': case 'C':
@@ -636,8 +647,32 @@ function run(raw){
         print('HOI HOI! TYPE HELP IF YOU ARE LOST.', 'l-hi'); return;
     }
 
+    if (fromTerm) return false;
     print('BAD COMMAND OR FILE NAME', 'l-err');
+    return false;
 }
+
+/* ---------- pop-up terminal (term.js is loaded the first time) ---------- */
+var termLoading = false;
+function openTerm(){
+    if (window.HWTERM){ HWTERM.toggle(); return; }
+    if (termLoading) return;
+    termLoading = true;
+    var s = document.createElement('script');
+    s.src = 'term.js';
+    s.onload = function(){ termLoading = false; if (window.HWTERM) HWTERM.open(); };
+    s.onerror = function(){ termLoading = false; print('TERMINAL COULD NOT LOAD.', 'l-err'); };
+    document.body.appendChild(s);
+}
+window.HWBBS = {
+    exec:function(line, printer){ termPrinter = printer; var r = run(line, true); return r !== false; },
+    openTerm:openTerm
+};
+document.addEventListener('keydown', function(e){
+    var tag = (e.target && e.target.tagName) || '';
+    if (e.key === 'F2'){ e.preventDefault(); openTerm(); return; }
+    if (e.key === '`' && tag !== 'INPUT' && tag !== 'TEXTAREA'){ e.preventDefault(); openTerm(); }
+});
 
 /* ---------- typing anywhere + konami code (normal pages only) ---------- */
 if (!isGame){
