@@ -5,7 +5,7 @@
 /* ---------- where things live ---------- */
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
-    games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html', videos:'videos.html',
+    games:'games.html', raid:'raid.html', tower:'tower.html', chess:'chess.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html', videos:'videos.html',
     music:'music.html',
     soundcloud:'https://soundcloud.com/hennupwoodmusic',
     mixcloud:'https://www.mixcloud.com/ronald-van-toledo/',
@@ -25,7 +25,8 @@ var NUMS = {
     about:    { '1':'soundcloud', '2':'mixcloud', '3':'youtube', '4':'facebook', '0':'main' },
     archives: { '0':'main' },
     art:      { '0':'main' },
-    games:    { '1':'raid', '2':'tower', '0':'main' },
+    games:    { '1':'raid', '2':'tower', '3':'chess', '0':'main' },
+    chess:    { '0':'games' },
     raid:     { '0':'games' },
     tower:    { '0':'games' }
 };
@@ -184,7 +185,7 @@ window.HWCOUNT = (function(){
         ['ANSI ART', 'art.html', ['art']],
         ['MODS', 'mods.html', ['mods', 'whitelabel']],
         ['VIDEOS', 'videos.html', ['videos']],
-        ['DOORS', 'games.html', ['games', 'raid', 'tower']],
+        ['DOORS', 'games.html', ['games', 'raid', 'tower', 'chess']],
         ['BULLETINS', 'bulletins.html', ['bulletins']],
         ['CONTACT', 'contact.html', ['contact']]
     ];
@@ -376,6 +377,7 @@ function run(raw){
     case 'VIDEOS': case 'VIDEO': case 'YT': case 'TV': go('videos'); return;
     case 'RAID': go('raid'); return;
     case 'TOWER': go('tower'); return;
+    case 'CHESS': case 'SCHAAK': case 'SCHAKEN': go('chess'); return;
     case 'CONTACT': case 'MAIL': case 'E': go('contact'); return;
 
     case 'CLS': case 'CLEAR':
