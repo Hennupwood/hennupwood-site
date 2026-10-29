@@ -57,6 +57,66 @@ var st = document.createElement('style');
 st.textContent = css;
 document.head.appendChild(st);
 
+/* ---------- GoatCounter: visitors, plays and downloads ---------- */
+var GC_SITE = 'https://hennupwood.goatcounter.com';
+(function(){
+    if (document.querySelector('script[data-goatcounter]')) return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://gc.zgo.at/count.js';
+    s.setAttribute('data-goatcounter', GC_SITE + '/count');
+    document.head.appendChild(s);
+})();
+
+window.HWCOUNT = (function(){
+    var pending = [], cache = {}, queue = [], active = 0;
+    function flush(){
+        if (!window.goatcounter || !window.goatcounter.count) return setTimeout(flush, 300);
+        while (pending.length) window.goatcounter.count(pending.shift());
+    }
+    function event(path, title){
+        pending.push({ path:path, title:title || path, event:true });
+        flush();
+    }
+    function next(){
+        if (active >= 4 || !queue.length) return;
+        var job = queue.shift(); active++;
+        fetch(GC_SITE + '/counter/' + encodeURIComponent(job.path) + '.json')
+            .then(function(r){ return r.ok ? r.json() : { count:'0' }; })
+            .then(function(d){ cache[job.path] = d.count || '0'; job.cb(cache[job.path]); })
+            .catch(function(){ job.cb(null); })
+            .then(function(){ active--; next(); });
+        next();
+    }
+    function get(path, cb){
+        if (path in cache){ cb(cache[path]); return; }
+        queue.push({ path:path, cb:cb }); next();
+    }
+    function bump(path){                     // show +1 right away after a play or download
+        var n = parseInt(String(cache[path] || '0').replace(/[^0-9]/g, ''), 10) || 0;
+        cache[path] = (n + 1).toLocaleString('en-US');
+        return cache[path];
+    }
+    return { event:event, get:get, bump:bump, cached:function(p){ return cache[p]; } };
+})();
+
+/* caller number on the main menu, like the old board */
+(function(){
+    if ((document.body.getAttribute('data-page') || 'index') !== 'index') return;
+    var lines = document.querySelectorAll('.box div');
+    var up = null;
+    for (var i = 0; i < lines.length; i++){
+        if (/^UPTIME\.+/.test(lines[i].textContent.trim())) { up = lines[i]; break; }
+    }
+    if (!up) return;
+    var row = document.createElement('div');
+    row.innerHTML = 'CALLERS........... <span class="yellow" id="callers">...</span>';
+    up.parentNode.insertBefore(row, up.nextSibling);
+    HWCOUNT.get('TOTAL', function(n){
+        document.getElementById('callers').textContent = n ? n : 'UNKNOWN';
+    });
+})();
+
 /* ---------- starfield behind the board (like the Space Raid title screen) ----------
    On the MOD AREA it dances along with the music: HWSTARS.beat() / HWSTARS.level() */
 (function(){

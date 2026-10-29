@@ -215,7 +215,7 @@ pre.diz{ color:#aaaaaa; line-height:1.12; }
 .flist{ margin-top:6px; }
 .frow{
     display:grid;
-    grid-template-columns:auto 15ch 6ch 9ch minmax(0,1fr) 15ch auto auto;
+    grid-template-columns:auto 15ch 6ch 9ch minmax(0,1fr) 15ch 13ch auto auto;
     gap:0 12px;
     align-items:baseline;
     padding:4px 6px;
@@ -229,6 +229,8 @@ pre.diz{ color:#aaaaaa; line-height:1.12; }
 .frow .dt{ color:#777; }
 .frow .ti{ color:#ff00ff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .frow .ar{ color:#aaaaaa; white-space:nowrap; }
+.frow .cnt{ color:#666; white-space:nowrap; font-size:13px; }
+.frow .cnt b{ font-weight:normal; color:#ffff00; }
 .frow button, .frow a.dl{
     font-family:"Courier New", monospace; font-size:13px;
     background:#000; color:#00ffff; border:1px solid #440055; padding:2px 6px; cursor:pointer; white-space:nowrap;
@@ -257,6 +259,7 @@ pre.diz{ color:#aaaaaa; line-height:1.12; }
     .frow .fn{ grid-column:2; }
     .frow .ti{ grid-column:2; grid-row:2; }
     .frow .ar{ grid-column:2; grid-row:3; font-size:13px; }
+    .frow .cnt{ grid-column:2; grid-row:4; }
     .frow .play{ grid-row:1 / span 3; align-self:center; }
 }
 
@@ -531,6 +534,19 @@ var MODS = [{"f": "c_o7day.xm", "n": "(C)O7DAY.XM", "t": "CroNiCleS", "a": "Necr
     var current = 'ALL';
 
     function kb(n){ return Math.round(n / 1024) + 'K'; }
+    function HWC(p){ return window.HWCOUNT ? HWCOUNT.cached(p) : null; }
+    function loadCounts(){
+        if (!window.HWCOUNT) return setTimeout(loadCounts, 200);
+        Array.prototype.forEach.call(filesEl.querySelectorAll('b[data-c]'), function(el){
+            var p = el.getAttribute('data-c');
+            HWCOUNT.get(p, function(n){ if (n !== null) el.textContent = n; });
+        });
+    }
+    function showCount(p, n){
+        Array.prototype.forEach.call(filesEl.querySelectorAll('b[data-c]'), function(el){
+            if (el.getAttribute('data-c') === p) el.textContent = n;
+        });
+    }
     function esc(s){ var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
     /* filter buttons */
@@ -565,6 +581,7 @@ var MODS = [{"f": "c_o7day.xm", "n": "(C)O7DAY.XM", "t": "CroNiCleS", "a": "Necr
                  +   '<span class="dt">' + m.d + '</span>'
                  +   '<span class="ti">' + esc(m.t) + '</span>'
                  +   '<span class="ar">' + esc(m.a) + '</span>'
+                 +   '<span class="cnt" title="times played / downloaded">&#9658; <b data-c="play/' + m.f + '">' + (HWC('play/' + m.f) || '&middot;') + '</b> &nbsp;&darr; <b data-c="dl/' + m.f + '">' + (HWC('dl/' + m.f) || '&middot;') + '</b></span>'
                  +   '<button data-act="info" aria-expanded="false">INFO</button>'
                  +   '<a class="dl" href="mods/' + m.f + '" download="' + esc(m.n) + '">DL</a>'
                  +   '<div class="finfo"><span class="meta">' + esc(m.tr) + ' &middot; ' + (m.ch || '?') + ' CHANNELS &middot; ' + m.bpm + ' BPM</span>' + esc(m.i || '(no texts in this one)') + '</div>'
@@ -573,9 +590,17 @@ var MODS = [{"f": "c_o7day.xm", "n": "(C)O7DAY.XM", "t": "CroNiCleS", "a": "Necr
         if (year !== null) html += '</div>';
         filesEl.innerHTML = html;
         markPlaying();
+        loadCounts();
     }
 
     filesEl.addEventListener('click', function(e){
+        var dl = e.target.closest('a.dl');
+        if (dl && window.HWCOUNT){
+            var dm = MODS[+dl.closest('.frow').getAttribute('data-i')];
+            HWCOUNT.event('dl/' + dm.f, 'DL ' + dm.n);
+            showCount('dl/' + dm.f, HWCOUNT.bump('dl/' + dm.f));
+            return;
+        }
         var btn = e.target.closest('[data-act]');
         if (!btn) return;
         var row = btn.closest('.frow');
@@ -641,6 +666,7 @@ var MODS = [{"f": "c_o7day.xm", "n": "(C)O7DAY.XM", "t": "CroNiCleS", "a": "Necr
             try { p.stop(); } catch(e){}
             try { if (p.setRepeatCount) p.setRepeatCount(0); } catch(e){}
             p.load('mods/' + m.f);
+            if (window.HWCOUNT){ HWCOUNT.event('play/' + m.f, 'PLAY ' + m.n); showCount('play/' + m.f, HWCOUNT.bump('play/' + m.f)); }
             npWhat.textContent = m.t + ' \u2014 ' + m.a + ' (' + m.n + ')';
             acc = 0; t0 = Date.now(); npPause.textContent = 'PAUSE';
             clearInterval(timer); timer = setInterval(tick, 500); tick();
