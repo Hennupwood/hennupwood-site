@@ -45,6 +45,12 @@ var css = ''
  + '@keyframes hwblink{50%{opacity:0;}}'
  + '#hwterm input{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}'
  + '#hwterm .c-hi{color:#ffff55;} #hwterm .c-pk{color:#ff55ff;} #hwterm .c-cy{color:#55ffff;} #hwterm .c-bl{color:#5555ff;} #hwterm .c-er{color:#ff5555;} #hwterm .c-dim{color:#555555;} #hwterm .c-gr{color:#55ff55;}'
+ + '#hwterm .telpanel{position:absolute;left:0;right:0;top:27px;bottom:0;display:flex;flex-direction:column;background:#000;}'
+ + '#hwterm .telbar{display:flex;align-items:center;gap:10px;padding:4px 10px;background:#000044;color:#55ffff;font-size:13px;}'
+ + '#hwterm .telbar span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
+ + '#hwterm .telbar button{font:inherit;background:#000;color:#ff5555;border:1px solid #ff5555;padding:1px 10px;cursor:pointer;}'
+ + '#hwterm .telpanel iframe{flex:1;width:100%;border:0;background:#000;}'
+ + '#hwterm{position:fixed;}'
  + '@media (max-width:640px){#hwterm{width:100vw;height:100%;left:0;top:0;transform:none;border-width:0;}#hwterm .bar{cursor:default;}}';
 var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
@@ -340,6 +346,65 @@ function play(m){
     }).catch(function(){ say('THE PLAYER COULD NOT LOAD. TRY THE MOD AREA.', 'c-er'); });
 }
 
+/* ---------- TELNET: call real boards that are still online (via fTelnet by Rick Parrish) ---------- */
+var BOARDS = [
+    ['BLACKFLAG', 'blackflag.acid.org',          'Black Flag — ACiD art show board since 1995, Florida'],
+    ['LEVEL29',   'bbs.fozztexx.com',            'Level 29 — retro board on a real old PC, California'],
+    ['VERT',      'vert.synchro.net',            'Vertrauen — home of Synchronet BBS software'],
+    ['BLACKICE',  'blackice.bbsindex.de',        'Black Ice — German board with ANSI art and doors'],
+    ['LORD',      'playlord.org',                'Play LORD — Legend of the Red Dragon, the door game'],
+    ['KEEP',      'thekeep.net',                 'The Keep — classic board with messages and games']
+];
+var telPanel = null;
+function telnetList(){
+    var lines = ['═══ OTHER BOARDS — STILL ONLINE ═══════════════════════════════'];
+    BOARDS.forEach(function(b, i){ lines.push(' [' + (i + 1) + '] ' + pad(b[0], 10) + b[2]); });
+    lines.push('', ' TELNET <NUMBER>  or  TELNET <NAME>  or  TELNET <HOST>   (port 23 only)',
+               ' These boards are run by other sysops around the world. Be nice, and new users are welcome.',
+               ' Boards come and go — if one does not answer, try another.');
+    say(lines.join('\n'), '');
+}
+function telnet(arg){
+    var A = arg.toUpperCase(), host = null, label = null, n = parseInt(A, 10);
+    if (n && BOARDS[n - 1]){ host = BOARDS[n - 1][1]; label = BOARDS[n - 1][0]; }
+    BOARDS.forEach(function(b){ if (b[0] === A || b[1].toUpperCase() === A){ host = b[1]; label = b[0]; } });
+    if (!host){
+        var h = arg.trim().replace(/^telnet:\/\//i, '').replace(/[\/].*$/, '');
+        if (/:\d+$/.test(h) && !/:23$/.test(h)){ say('THE PUBLIC PROXY ONLY CONNECTS TO PORT 23. ' + h + ' WILL NOT ANSWER.', 'c-er'); return; }
+        h = h.replace(/:23$/, '');
+        if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(h)){ say('Unknown board - ' + arg + '. Type TELNET for the list.', 'c-er'); return; }
+        host = h.toLowerCase(); label = host.toUpperCase();
+    }
+    say('ATDT ' + host.toUpperCase(), 'c-dim');
+    say('DIALING VIA FTELNET PROXY...', 'c-bl');
+    then(function(){
+        var src = 'https://embed.ftelnet.ca/?Hostname=' + encodeURIComponent(host) + '&Port=23'
+                + '&Proxy=proxy-us-ga.ftelnet.ca&ProxyPort=80&ProxyPortSecure=443'
+                + '&ConnectionType=telnet&Emulation=ansi-bbs'
+                + '&VirtualKeyboard=' + (window.innerWidth <= 640 ? 'on' : 'off');
+        telPanel = document.createElement('div');
+        telPanel.className = 'telpanel';
+        telPanel.innerHTML = '<div class="telbar"><span>CONNECTED TO ' + esc(label) + ' — ' + esc(host) + '</span>'
+                           + '<button type="button">HANG UP</button></div>'
+                           + '<iframe title="Telnet session with ' + esc(host) + '" allow="clipboard-read; clipboard-write"></iframe>';
+        telPanel.querySelector('iframe').src = src;
+        telPanel.querySelector('button').addEventListener('click', hangup);
+        win.appendChild(telPanel);
+        win.classList.add('online');
+        document.getElementById('hwbaud').textContent = 'TELNET';
+        if (window.HWCOUNT) HWCOUNT.event('telnet/' + host, 'TELNET ' + host);
+        setTimeout(function(){ try { telPanel.querySelector('iframe').focus(); } catch(e){} }, 300);
+    });
+}
+function hangup(){
+    if (!telPanel) return;
+    telPanel.parentNode.removeChild(telPanel); telPanel = null;
+    win.classList.remove('online');
+    document.getElementById('hwbaud').textContent = BAUD;
+    say('+++ATH0', 'c-dim'); say('NO CARRIER', 'c-er'); say('');
+    setTimeout(function(){ inp.focus(); }, 30);
+}
+
 /* ---------- commands ---------- */
 var BAUDS = [300, 1200, 2400, 9600, 14400, 28800, 33600, 56000];
 var history = [], hpos = 0;
@@ -352,7 +417,7 @@ function help(){
         ' RUN <DOOR>      open a door game       BAUD <SPEED>      change modem speed',
         ' CLS             clear the screen       VER / TIME / WHO  system info',
         ' EXIT            close the terminal     BYE               log off the board',
-        ' TELNET          call other boards (coming soon)',
+        ' TELNET          call other boards that are still online',
         '',
         ' Every board command works here too: MUSIC, MODS, ART, DOORS, NOVA, UFO, SYSOP...',
         ' TAB completes names, \u2191 \u2193 recall commands, ESC skips slow output.',
@@ -417,8 +482,12 @@ function exec(raw){
         say('HENNUPWOOD BBS v1.0 \u2014 TERMINAL MODE \u2014 ANSI-BBS EMULATION, ' + BAUD + ' BPS', 'c-hi'); return;
     case 'ECHO': say(arg); return;
     case 'MEM': say('655,360 bytes total conventional memory\n640K ought to be enough for anybody.'); return;
-    case 'TELNET':
-        say('TELNET is being wired up by the sysop. Coming soon: call real BBSes that are still online.', 'c-pk'); return;
+    case 'TELNET': case 'DIAL': case 'ATDT': case 'CALL':
+        if (!arg) telnetList(); else telnet(arg);
+        return;
+    case 'HANGUP': case 'ATH':
+        if (telPanel) hangup(); else say('NOT CONNECTED.', 'c-dim');
+        return;
     case 'EXIT': case 'QUIT': case 'Q': close(); return;
     }
     /* everything else: the normal board commands (NOVA, UFO, SYSOP, WHO, TIME, MUSIC, ...) */
@@ -433,10 +502,11 @@ function exec(raw){
 function complete(){
     var v = inp.value, parts = v.split(/\s+/), lastW = (parts[parts.length - 1] || '').toUpperCase();
     var pool = parts.length === 1
-        ? ['HELP','DIR','CD','TYPE','PLAY','STOP','RUN','BAUD','CLS','VER','EXIT','BYE','TELNET','WHO','TIME','NOVA','UFO','UFOS']
+        ? ['HELP','DIR','CD','TYPE','PLAY','STOP','RUN','BAUD','CLS','VER','EXIT','BYE','TELNET','HANGUP','WHO','TIME','NOVA','UFO','UFOS']
         : (parts[0].toUpperCase() === 'CD' ? entries().dirs.concat(['..'])
            : parts[0].toUpperCase() === 'PLAY' ? MODS.map(function(m){ return m[1].split('.')[0].replace(/^DL[_#]/, '').replace(/^\(C\)/, ''); })
            : parts[0].toUpperCase() === 'RUN' ? DOORS.map(function(d){ return d[0].split('.')[0]; })
+           : parts[0].toUpperCase() === 'TELNET' ? BOARDS.map(function(b){ return b[0]; })
            : entries().files.map(function(f){ return f[0]; }));
     var hits = pool.filter(function(p){ return p.indexOf(lastW) === 0; });
     if (hits.length === 1){ parts[parts.length - 1] = hits[0]; inp.value = parts.join(' ') + (parts.length === 1 ? ' ' : ''); }
@@ -476,7 +546,7 @@ function open(){
     }
     setPrompt();
 }
-function close(){ win.classList.remove('open'); inp.blur(); }
+function close(){ if (telPanel) hangup(); win.classList.remove('open'); inp.blur(); }
 function toggle(){ if (win.classList.contains('open')) close(); else open(); }
 
 window.HWTERM = { open:open, close:close, toggle:toggle, say:say, exec:exec };
