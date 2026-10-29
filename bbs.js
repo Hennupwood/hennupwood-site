@@ -145,6 +145,61 @@ window.HWCOUNT = (function(){
         }
         if (still) frame();
     }
+    /* ---- supernovas: now and then a star blows up, always next to the board ---- */
+    var novas = [], nextNova = performance.now() + 12000 + Math.random() * 15000;
+    function freeSpot(){
+        var box = document.querySelector('.box'), r = box ? box.getBoundingClientRect() : null;
+        for (var t = 0; t < 30; t++){
+            var x = 20 + Math.random() * (window.innerWidth - 40), y = 60 + Math.random() * (window.innerHeight - 100);
+            if (r && x > r.left - 40 && x < r.right + 40 && y > r.top - 40 && y < r.bottom + 40) continue;
+            return [x / SCALE, y / SCALE];
+        }
+        return null;
+    }
+    function spawnNova(){
+        var p = freeSpot(); if (!p) return false;
+        var parts = [];
+        for (var k = 0; k < 18; k++){
+            var a = Math.random() * Math.PI * 2, v = 0.3 + Math.random() * 0.9;
+            parts.push({ vx:Math.cos(a) * v, vy:Math.sin(a) * v, c:DISCO[k % DISCO.length] });
+        }
+        novas.push({ x:p[0], y:p[1], t0:performance.now(), dur:3800, R:16 + Math.random() * 14, parts:parts });
+        return true;
+    }
+    function drawNovas(now){
+        for (var n = novas.length - 1; n >= 0; n--){
+            var nv = novas[n], t = (now - nv.t0) / nv.dur;
+            if (t >= 1){ novas.splice(n, 1); continue; }
+            var x = nv.x | 0, y = nv.y | 0, fade = 1 - t;
+            sg.globalAlpha = Math.max(0, fade);
+            /* core flash + flare spikes */
+            var core = t < 0.12 ? t / 0.12 : Math.max(0, 1 - (t - 0.12) * 1.6);
+            var cr = Math.round(core * 3), spike = Math.round(core * 14);
+            sg.fillStyle = '#ffffff';
+            sg.fillRect(x - cr, y - cr, cr * 2 + 1, cr * 2 + 1);
+            sg.fillRect(x - spike, y, spike * 2 + 1, 1);
+            sg.fillRect(x, y - spike, 1, spike * 2 + 1);
+            /* expanding ring in ANSI colours */
+            var e = 1 - Math.pow(1 - Math.min(1, t * 1.4), 3), rad = e * nv.R;
+            sg.fillStyle = t < 0.25 ? '#ffffff' : t < 0.45 ? '#ffff55' : t < 0.7 ? '#ff55ff' : '#aa00aa';
+            if (rad > 1){
+                var steps = Math.max(12, Math.round(rad * 6));
+                for (var s = 0; s < steps; s++){
+                    var a = s / steps * Math.PI * 2;
+                    sg.fillRect((x + Math.cos(a) * rad) | 0, (y + Math.sin(a) * rad * 0.9) | 0, 1, 1);
+                }
+            }
+            /* sparks flying off */
+            var d = e * nv.R * 1.6;
+            for (var k = 0; k < nv.parts.length; k++){
+                var pp = nv.parts[k];
+                sg.fillStyle = pp.c;
+                sg.fillRect((x + pp.vx * d) | 0, (y + pp.vy * d) | 0, 1, 1);
+            }
+            sg.globalAlpha = 1;
+        }
+    }
+
     function frame(){
         sg.fillStyle = '#000';
         sg.fillRect(0, 0, SW, SH);
@@ -161,6 +216,14 @@ window.HWCOUNT = (function(){
             var len = (!still && boost > 0.25 && s.v > 0.3) ? 1 + Math.round(boost * 3) : 1;   // little streaks on a hard kick
             sg.fillRect(s.x | 0, s.y | 0, 1, len);
         }
+        if (!still){
+            var now = performance.now();
+            if (now > nextNova){
+                spawnNova();
+                nextNova = now + 30000 + Math.random() * 60000;
+            }
+            if (novas.length) drawNovas(now);
+        }
         boost *= 0.9; flash *= 0.9; lvl *= 0.92;
     }
     function loop(){ frame(); requestAnimationFrame(loop); }
@@ -170,7 +233,8 @@ window.HWCOUNT = (function(){
 
     window.HWSTARS = {
         beat: function(strength){ if (still) return; beats++; boost = Math.min(1, boost + (strength || 0.6)); flash = 1; },
-        level: function(l){ if (!still) lvl = Math.max(lvl, Math.min(1, l)); }
+        level: function(l){ if (!still) lvl = Math.max(lvl, Math.min(1, l)); },
+        nova: function(){ return still ? false : spawnNova(); }
     };
 })();
 
@@ -422,6 +486,10 @@ function run(raw){
         return;
     case 'ATH': case '+++': case 'ATH0':
         print('NO CARRIER', 'l-err'); return;
+    case 'NOVA': case 'SUPERNOVA': case 'BOOM':
+        if (window.HWSTARS && HWSTARS.nova()) print('SUPERNOVA DETECTED. LOOK NEXT TO THE BOARD.', 'l-hi');
+        else print('NO ROOM IN THE SKY RIGHT NOW. SCROLL A BIT AND TRY AGAIN.', 'l-ok');
+        return;
     case 'XYZZY':
         print('NOTHING HAPPENS.', 'l-ok'); return;
     case 'SYSOP': case 'PAGE': case 'CHAT': case 'C':
