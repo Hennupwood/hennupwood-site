@@ -6,7 +6,7 @@
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
     games:'games.html', raid:'raid.html', tower:'tower.html', bulletins:'bulletins.html', contact:'contact.html', mods:'mods.html', whitelabel:'whitelabel.html', videos:'videos.html',
-    music:'https://soundcloud.com/hennupwoodmusic',
+    music:'music.html',
     soundcloud:'https://soundcloud.com/hennupwoodmusic',
     mixcloud:'https://www.mixcloud.com/ronald-van-toledo/',
     youtube:'https://www.youtube.com/@hennupwooddalamainstadub8583',
@@ -17,6 +17,7 @@ var LINKS = {
 var NUMS = {
     index:    { '1':'music', '2':'archives', '3':'about', '4':'contact', '5':'art', '6':'games', '7':'bulletins', '8':'mods', '9':'videos' },
     videos:   { '0':'main' },
+    music:    { '0':'main' },
     mods:     { '0':'main' },
     whitelabel:{ '0':'mods' },
     contact:  { '0':'main' },
@@ -177,7 +178,7 @@ window.HWCOUNT = (function(){
     if (!logo) return;
     var items = [
         ['MAIN', 'index.html', ['index']],
-        ['MUSIC', 'https://soundcloud.com/hennupwoodmusic', []],
+        ['MUSIC', 'music.html', ['music']],
         ['ARCHIVES', 'archives.html', ['archives']],
         ['ABOUT', 'about.html', ['about']],
         ['ANSI ART', 'art.html', ['art']],
@@ -340,7 +341,7 @@ function run(raw){
             '═══ HELP ══════════════════════════════════',
             '  MENU NUMBERS  pick an option on this page',
             '  MAIN          back to the main menu',
-            '  MUSIC         SoundCloud',
+            '  MUSIC         hennupwood tracks',
             '  ARCHIVES      releases, artwork, live',
             '  ABOUT         sysop profile',
             '  ANSI ART      the ANSI art archive',
@@ -360,7 +361,8 @@ function run(raw){
         return;
 
     case 'MAIN': case 'M': case 'MENU': case 'HOME': go('main'); return;
-    case 'MUSIC': case 'SOUNDCLOUD': go('music'); return;
+    case 'MUSIC': go('music'); return;
+    case 'SOUNDCLOUD': case 'SC': go('soundcloud'); return;
     case 'MIXCLOUD': go('mixcloud'); return;
     case 'YOUTUBE': go('youtube'); return;
     case 'FACEBOOK': go('facebook'); return;

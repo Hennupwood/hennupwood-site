@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Music by Hennupwood — every track, playable right on the board. Techno, house, minimal, dub and more.">
+<meta name="author" content="Ronald van Toledo (Hennupwood)">
+<title>Music — Hennupwood BBS</title>
+
+<style>
+
+body{
+    background:#000;
+    color:#999;
+    font-family:"Courier New", monospace;
+    margin:0;
+    padding:0;
+}
+
+.wrapper{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.logo img{
+    width:340px;
+    height:auto;
+    transform:scaleY(1.2);
+    transform-origin:center;
+}
+
+.purple{ color:#ff00ff; }
+.blue{ color:#0066ff; }
+.cyan{ color:#00ffff; }
+.yellow{ color:#ffff00; }
+
+.box{
+    margin-top:20px;
+    padding:30px 34px;
+    border:14px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 30px #8800aa, 0 0 60px #440055;
+}
+
+.ansi-line{
+    height:0;
+    border-style:solid;
+    border-width:14px 0 0 0;
+    border-image:url('frame-outer.png') 14 0 0 0 stretch;
+    margin:0 0 16px 0;
+}
+
+a{
+    color:#00ffff;
+    text-decoration:none;
+}
+
+a:hover{
+    color:#ffff00;
+}
+
+.menu{
+    margin-top:24px;
+    line-height:2;
+}
+
+.menu .num{ color:#ff00ff; }
+.menu .soon{ color:#555; }
+
+/* --- game --- */
+
+.game{
+    margin-top:30px;
+    max-width:640px;
+}
+
+.screen{
+    position:relative;
+    border:10px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 18px #8800aa, 0 0 36px #440055;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    image-rendering:pixelated;
+    background:#000;
+    touch-action:none;
+}
+
+.help{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.8;
+}
+
+.help .key{ color:#ffff00; }
+
+.touch{
+    display:none;
+    margin-top:14px;
+    gap:10px;
+}
+
+.touch button{
+    flex:1;
+    font-family:"Courier New", monospace;
+    font-size:20px;
+    padding:14px 0;
+    background:#000;
+    color:#00ffff;
+    border:2px solid #aa00aa;
+    box-shadow:0 0 10px #440055;
+    -webkit-user-select:none;
+    user-select:none;
+    touch-action:none;
+}
+
+.touch button:active{
+    background:#0000aa;
+    color:#fff;
+}
+
+.touch .fire{ color:#ffff00; }
+
+@media (hover:none) and (pointer:coarse){
+    .touch{ display:flex; }
+    .help .desktop{ display:none; }
+}
+
+.prompt{
+    margin-top:30px;
+    color:#00ffff;
+}
+
+.blink{
+    animation:blink 1s step-end infinite;
+}
+
+@keyframes blink{
+    50%{ opacity:0; }
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    color:#444;
+    font-size:12px;
+}
+
+
+.doors{
+    margin-top:24px;
+    line-height:2;
+}
+.doors .num{ color:#ff00ff; }
+.doors .desc{ color:#666; }
+
+
+.scwrap{
+    margin-top:26px;
+    border:12px solid transparent;
+    border-image:url('frame-outer.png') 14 stretch;
+    background:#000;
+    box-shadow:0 0 24px #8800aa, 0 0 48px #440055;
+}
+.scwrap iframe{ display:block; width:100%; height:166px; border:0; }
+.status{ margin-top:18px; color:#0066ff; }
+.status.err{ color:#ff5555; }
+.tracks{ margin-top:14px; }
+.trow{
+    display:grid;
+    grid-template-columns:auto 64px minmax(0,1fr) 7ch 6ch 11ch auto;
+    gap:0 14px;
+    align-items:center;
+    padding:6px;
+    border-bottom:1px dotted #1a0022;
+}
+.trow:hover{ background:#05001a; }
+.trow.playing{ background:#0000aa; }
+.trow.playing .tt{ color:#fff; }
+.trow img, .trow .noart{ width:64px; height:64px; object-fit:cover; background:#111; border:1px solid #440055; display:block; }
+.trow .tt{ color:#ff00ff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.trow .tg{ color:#666; font-size:13px; display:block; margin-top:2px; }
+.trow .yr, .trow .du{ color:#777; }
+.trow .pc{ color:#666; font-size:13px; white-space:nowrap; }
+.trow .pc b{ color:#ffff00; font-weight:normal; }
+.trow button, .trow a.sc{
+    font-family:"Courier New", monospace; font-size:13px;
+    background:#000; color:#00ffff; border:1px solid #440055; padding:3px 7px; cursor:pointer; white-space:nowrap;
+}
+.trow button{ color:#ffff00; min-width:7ch; }
+.trow button:hover, .trow a.sc:hover{ color:#ffff00; border-color:#ff00ff; }
+@media (max-width:700px){
+    .trow{ grid-template-columns:auto 48px minmax(0,1fr) auto; }
+    .trow img, .trow .noart{ width:48px; height:48px; }
+    .trow .yr, .trow .du, .trow .pc{ display:none; }
+}
+
+</style>
+</head>
+
+<body data-page="music">
+
+<div class="wrapper">
+
+<div class="logo">
+    <img src="logo.png" alt="Hennupwood Logo">
+</div>
+
+<div class="box">
+
+<div class="ansi-line"></div>
+
+<div class="blue">
+MUSIC
+</div>
+
+<br>
+
+<div>ARTIST............ HENNUPWOOD</div>
+<div>SOURCE............ SOUNDCLOUD</div>
+<div>TRACKS............ <span id="nTracks">...</span></div>
+
+<br>
+
+<div class="cyan">LOADING ATMOSPHERIC AUDIO SYSTEM...</div>
+
+<br>
+
+<div class="yellow">READY.</div>
+
+<div class="scwrap">
+    <iframe id="sc" title="Hennupwood on SoundCloud" allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/hennupwoodmusic&amp;color=%23aa00aa&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;show_teaser=false&amp;visual=false"></iframe>
+</div>
+
+<div class="status" id="status">FETCHING TRACK LIST...</div>
+<div class="tracks" id="tracks"></div>
+
+<div class="term-out" id="termOut"></div>
+
+<div class="prompt">
+<span class="purple">[0]</span> <a href="index.html">BACK TO MAIN</a> &nbsp; COMMAND &gt; <span class="cmdline" id="cmdline"><span class="blink">█</span></span>
+</div>
+
+</div>
+
+<div class="footer">
+HENNUPWOOD MUSIC BBS v1.0<br>
+Inspired by the ANSI / BBS scene.
+</div>
+
+</div>
+
+<script src="https://w.soundcloud.com/player/api.js"></script>
+<script>
+(function(){
+    var list = document.getElementById('tracks');
+    var status = document.getElementById('status');
+    var sounds = [], current = -1, widget = null, tries = 0;
+
+    function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+    function dur(ms){ var s = Math.round((ms || 0) / 1000); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+    function year(x){ var d = x.display_date || x.release_date || x.created_at; return d ? String(d).slice(0, 4) : ''; }
+    function art(x){
+        var a = x.artwork_url || (x.user && x.user.avatar_url);
+        return a ? a.replace('-large.', '-t200x200.') : null;
+    }
+
+    function render(){
+        var html = '';
+        sounds.forEach(function(x, i){
+            var full = !!x.title;
+            var a = full ? art(x) : null;
+            html += '<div class="trow' + (i === current ? ' playing' : '') + '" data-i="' + i + '">'
+                 +   '<button data-act="play">' + (i === current ? '&#9632; STOP' : '&#9658; PLAY') + '</button>'
+                 +   (a ? '<img src="' + esc(a) + '" alt="" loading="lazy">' : '<span class="noart"></span>')
+                 +   '<span class="tt">' + (full ? esc(x.title) : 'TRACK ' + (i + 1) + ' &middot; loading...')
+                 +     (full && x.genre ? '<span class="tg">' + esc(x.genre) + '</span>' : '') + '</span>'
+                 +   '<span class="yr">' + (full ? year(x) : '') + '</span>'
+                 +   '<span class="du">' + (full ? dur(x.duration || x.full_duration) : '') + '</span>'
+                 +   '<span class="pc">' + (full && x.playback_count != null ? '&#9658; <b>' + Number(x.playback_count).toLocaleString('en-US') + '</b>' : '') + '</span>'
+                 +   (full && x.permalink_url ? '<a class="sc" href="' + esc(x.permalink_url) + '" target="_blank" rel="noopener">SC</a>' : '<span></span>')
+                 + '</div>';
+        });
+        list.innerHTML = html;
+        document.getElementById('nTracks').textContent = sounds.length || '...';
+    }
+
+    /* the widget hands over full details for the first few tracks and fills in the rest bit by bit */
+    function fetchList(){
+        widget.getSounds(function(s){
+            sounds = s || [];
+            render();
+            var missing = sounds.filter(function(x){ return !x.title; }).length;
+            if (!sounds.length){ status.textContent = 'NO TRACKS FOUND.'; return; }
+            status.textContent = missing ? 'LOADING TRACK DETAILS... (' + (sounds.length - missing) + '/' + sounds.length + ')' : '';
+            if (missing && tries++ < 25) setTimeout(fetchList, 1200);
+            else if (missing) status.textContent = 'SOME DETAILS ARE STILL LOADING — PRESS PLAY TO HEAR ANY TRACK.';
+        });
+    }
+
+    list.addEventListener('click', function(e){
+        var b = e.target.closest('[data-act="play"]');
+        if (!b || !widget) return;
+        var i = +b.closest('.trow').getAttribute('data-i');
+        if (i === current){ widget.pause(); current = -1; render(); return; }
+        widget.skip(i);
+        widget.play();
+        current = i; render();
+        var x = sounds[i];
+        if (window.HWCOUNT) HWCOUNT.event('sc/' + (x.permalink || x.id), 'SC PLAY ' + (x.title || x.id));
+    });
+
+    function start(){
+        if (!window.SC || !SC.Widget){ status.textContent = 'SOUNDCLOUD COULD NOT LOAD. TRY THE PLAYER ABOVE OR VISIT SOUNDCLOUD.'; status.className = 'status err'; return; }
+        widget = SC.Widget(document.getElementById('sc'));
+        widget.bind(SC.Widget.Events.READY, fetchList);
+        widget.bind(SC.Widget.Events.PLAY, function(){
+            widget.getCurrentSoundIndex(function(i){ current = i; render(); });
+            widget.getCurrentSound(function(x){
+                if (x && x.title && sounds[current] && !sounds[current].title){ sounds[current] = x; render(); }
+            });
+        });
+        widget.bind(SC.Widget.Events.PAUSE, function(){ current = -1; render(); });
+        widget.bind(SC.Widget.Events.FINISH, function(){ current = -1; render(); });
+    }
+    if (window.SC) start(); else window.addEventListener('load', start);
+})();
+</script>
+
+<script src="bbs.js"></script>
+</body>
+</html>
