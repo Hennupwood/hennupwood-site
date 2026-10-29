@@ -200,6 +200,93 @@ window.HWCOUNT = (function(){
         }
     }
 
+    /* ---- UFOs: the aliens from SPYCO SPACE RAID come by now and then ---- */
+    var UPAL = { M:'#ff55ff', W:'#ffffff', k:'#000000', C:'#55ffff', Y:'#ffff55', B:'#5555ff', R:'#ff5555' };
+    var USPR = [
+        [["...MM...","..MMMM..",".MMWWMM.","MMWkkWMM",".MMWWMM.","..M..M..",".M....M."],
+         ["...MM...","..MMMM..",".MMWWMM.","MMWkkWMM",".MMWWMM.","..M..M..","..M..M.."]],
+        [["C......C","CC....CC",".CCYYCC.","..CYYC..",".CCBBCC.","C..BB..C"],
+         ["........","C......C","CCCYYCCC","..CYYC..",".CCBBCC.",".C.BB.C."]],
+        [["..RRRR..",".RYYYYR.","RYYkkYYR","RYYYYYYR",".R.RR.R.","R......R"],
+         ["..RRRR..",".RYYYYR.","RYkkYYYR","RYYYYYYR",".R.RR.R.",".R....R."]]
+    ];
+    var ufos = [], meets = [], nextUfo = performance.now() + 20000 + Math.random() * 20000, US = 2, UW = 8 * US;
+    /* the widest strip of sky next to the board, in canvas units */
+    function sideColumn(){
+        var box = document.querySelector('.box'), r = box ? box.getBoundingClientRect() : null;
+        if (!r) return { x:SW / 2, out:1 };
+        var left = r.left, right = window.innerWidth - r.right;
+        if (Math.max(left, right) < 50) return null;
+        return left >= right ? { x:(left / 2) / SCALE - UW / 2, out:-1 } : { x:(r.right + right / 2) / SCALE - UW / 2, out:1 };
+    }
+    function mk(x, y, vx, vy){
+        return { kind:(Math.random() * 3) | 0, x:x, y:y, vx:vx, vy:vy, ph:Math.random() * 6.28, amp:2 + Math.random() * 4, wait:0 };
+    }
+    function spawnUfo(forceMeet){
+        var col = sideColumn(), sp = 0.35 + Math.random() * 0.3;
+        if (col && (forceMeet || Math.random() < 0.35)){
+            /* two UFOs meet in the open sky next to the board */
+            var a = mk(col.x, -20, 0, sp), b = mk(col.x, SH + 20, 0, -sp);
+            a.partner = b; b.partner = a; a.out = b.out = col.out;
+            ufos.push(a, b); return true;
+        }
+        if (col && Math.random() < 0.5){
+            var down = Math.random() < 0.5;
+            ufos.push(mk(col.x + (Math.random() * 10 - 5), down ? -20 : SH + 20, 0, down ? sp : -sp));
+        } else {
+            var fromLeft = Math.random() < 0.5;
+            ufos.push(mk(fromLeft ? -20 : SW + 20, 30 + Math.random() * (SH - 60), fromLeft ? sp : -sp, 0));
+        }
+        return true;
+    }
+    function drawSprite(rows, x, y){
+        for (var r = 0; r < rows.length; r++)
+            for (var c = 0; c < rows[r].length; c++){
+                var ch = rows[r][c]; if (ch === '.') continue;
+                sg.fillStyle = UPAL[ch];
+                sg.fillRect((x + c * US) | 0, (y + r * US) | 0, US, US);
+            }
+    }
+    function drawUfos(now){
+        var frameNo = Math.floor(now / 250) % 2;
+        for (var i = ufos.length - 1; i >= 0; i--){
+            var u = ufos[i], p = u.partner, wob;
+            u.ph += u.wait > 0 ? 0.15 : 0.05;
+            if (u.wait > 0){
+                u.wait--;
+                if (u.wait === 0){                       // goodbye: both fly off to the outside of the screen
+                    u.vx = u.out * 0.7; u.vy = u.vy > 0 ? -0.25 : 0.25;
+                }
+            } else {
+                u.x += u.vx; u.y += u.vy;
+                if (p && !u.met && Math.abs(u.y - p.y) < 7 * US + 6){
+                    u.met = p.met = true; u.wait = p.wait = 200;            // about three seconds together
+                    meets.push({ a:u.vy > 0 ? u : p, b:u.vy > 0 ? p : u });
+                }
+            }
+            wob = Math.sin(u.ph) * (u.wait > 0 ? 1.5 : u.amp);
+            var dx = u.vy !== 0 && u.vx === 0 ? wob : 0, dy = u.vx !== 0 ? wob : 0;
+            drawSprite(USPR[u.kind][frameNo], u.x + dx, u.y + dy);
+            if (u.x < -40 || u.x > SW + 40 || u.y < -40 || u.y > SH + 40) ufos.splice(i, 1);
+        }
+        /* while two of them meet: blinking lights and a little beam between them */
+        for (var m = meets.length - 1; m >= 0; m--){
+            var mt = meets[m];
+            if (mt.a.wait <= 0){ meets.splice(m, 1); continue; }
+            var cx = (mt.a.x + UW / 2) | 0, y1 = mt.a.y + 7 * US, y2 = mt.b.y;
+            if (Math.floor(now / 120) % 2){
+                var cols = ['#ff55ff', '#55ffff', '#ffff55', '#55ff55'];
+                for (var yy = y1; yy < y2; yy += 1){
+                    sg.fillStyle = cols[(((yy | 0) + Math.floor(now / 90)) % cols.length + cols.length) % cols.length];
+                    sg.fillRect(cx + ((Math.sin(yy * 0.6 + now / 80) * 1.5) | 0), yy | 0, 1, 1);
+                }
+            }
+            sg.fillStyle = Math.floor(now / 200) % 2 ? '#ffffff' : '#ff55ff';
+            sg.fillRect((mt.a.x - 3) | 0, (mt.a.y + 2) | 0, 2, 2); sg.fillRect((mt.a.x + UW + 1) | 0, (mt.a.y + 2) | 0, 2, 2);
+            sg.fillRect((mt.b.x - 3) | 0, (mt.b.y + 2) | 0, 2, 2); sg.fillRect((mt.b.x + UW + 1) | 0, (mt.b.y + 2) | 0, 2, 2);
+        }
+    }
+
     function frame(){
         sg.fillStyle = '#000';
         sg.fillRect(0, 0, SW, SH);
@@ -223,6 +310,11 @@ window.HWCOUNT = (function(){
                 nextNova = now + 30000 + Math.random() * 60000;
             }
             if (novas.length) drawNovas(now);
+            if (now > nextUfo){
+                spawnUfo(false);
+                nextUfo = now + 40000 + Math.random() * 60000;
+            }
+            if (ufos.length) drawUfos(now);
         }
         boost *= 0.9; flash *= 0.9; lvl *= 0.92;
     }
@@ -234,7 +326,8 @@ window.HWCOUNT = (function(){
     window.HWSTARS = {
         beat: function(strength){ if (still) return; beats++; boost = Math.min(1, boost + (strength || 0.6)); flash = 1; },
         level: function(l){ if (!still) lvl = Math.max(lvl, Math.min(1, l)); },
-        nova: function(){ return still ? false : spawnNova(); }
+        nova: function(){ return still ? false : spawnNova(); },
+        ufo: function(meet){ return still ? false : spawnUfo(meet); }
     };
 })();
 
@@ -486,6 +579,10 @@ function run(raw){
         return;
     case 'ATH': case '+++': case 'ATH0':
         print('NO CARRIER', 'l-err'); return;
+    case 'UFO': case 'UFOS':
+        if (window.HWSTARS && HWSTARS.ufo(cmd === 'UFOS')) print(cmd === 'UFOS' ? 'TWO UFOS ON A COLLISION COURSE. WATCH THE SKY.' : 'UNIDENTIFIED FLYING OBJECT ON RADAR.', 'l-hi');
+        else print('THE SKY IS CLOSED TODAY.', 'l-ok');
+        return;
     case 'NOVA': case 'SUPERNOVA': case 'BOOM':
         if (window.HWSTARS && HWSTARS.nova()) print('SUPERNOVA DETECTED. LOOK NEXT TO THE BOARD.', 'l-hi');
         else print('NO ROOM IN THE SKY RIGHT NOW. SCROLL A BIT AND TRY AGAIN.', 'l-ok');
