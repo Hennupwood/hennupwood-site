@@ -412,12 +412,12 @@ window.HWCOUNT = (function(){
 /* ---------- the black hole above the main menu ---------- */
 function blackHole(host){
     var W = 240, H = 112, cv = document.createElement('canvas');
-    cv.width = W; cv.height = H; host.appendChild(cv);
+    cv.width = W; cv.height = H; cv.setAttribute('aria-hidden', 'true'); host.appendChild(cv);
     var g = cv.getContext('2d');
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var CX = W / 2, CY = H / 2 + 4, RH = 13, TILT = 0.26, RIN = 17, ROUT = 86;
+    var CX = W / 2, CY = H / 2 + 4, RH = 14, TILT = 0.26, RIN = 18, ROUT = 104;
     var disk = [], fall = [], t0 = performance.now(), nextFall = 0, ufo = null, nextUfo = performance.now() + 25000 + Math.random() * 35000;
-    for (var i = 0; i < 900; i++){
+    for (var i = 0; i < 1300; i++){
         var r = RIN + Math.pow(Math.random(), 1.6) * (ROUT - RIN);
         disk.push({ a:Math.random() * Math.PI * 2, r:r, w:0.9 / Math.pow(r / RIN, 1.5) * 0.045, j:Math.random() });
     }
@@ -525,8 +525,11 @@ function blackHole(host){
      + '.topnav a.brand{padding:0;margin-right:10px;display:inline-flex;align-items:center;}'
      + '.topnav a.brand img{height:34px;width:auto;display:block;transform:none;filter:drop-shadow(0 0 6px #0000aa);}'
      + '.topnav a.brand:hover img{filter:drop-shadow(0 0 8px #ff00ff);}'
-     + '.logo.bh{margin:0 auto 10px;text-align:center;}'
-     + '.logo.bh canvas{width:min(760px,100%);height:auto;image-rendering:pixelated;display:block;margin:0 auto;}'
+     + '.logo.bh{margin:0 auto;min-height:calc(100vh - 70px);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}'
+     + '.logo.bh canvas{width:min(1300px,98vw,calc((100vh - 150px) * 2.14));height:auto;image-rendering:pixelated;display:block;margin:0 auto;}'
+     + '.bh-hint{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#55ffff;letter-spacing:3px;font-size:14px;cursor:pointer;animation:hwhint 1.6s steps(2) infinite;}'
+     + '.bh-hint:hover{color:#ffff55;}'
+     + '@keyframes hwhint{50%{opacity:0.25;}}'
      + '.logo.gone{display:none;}'
      + '.bulletin{scroll-margin-top:80px !important;}'
      + '@media (max-width:600px){.topnav{font-size:13px;gap:2px 10px;margin:-10px -16px 0;padding:8px 16px;}.topnav a.brand{width:100%;justify-content:center;margin:0 0 4px;}.topnav a.brand img{height:26px;}}';
@@ -559,7 +562,21 @@ function blackHole(host){
     nav.appendChild(tb);
     logo.parentNode.insertBefore(nav, logo.nextSibling);
     logo.style.marginBottom = '0';
-    if (page === 'index'){ logo.innerHTML = ''; logo.className = 'logo bh'; logo.setAttribute('aria-hidden', 'true'); blackHole(logo); }
+    if (page === 'index'){
+        logo.innerHTML = ''; logo.className = 'logo bh';
+        blackHole(logo);
+        var hint = document.createElement('div');
+        hint.className = 'bh-hint'; hint.setAttribute('role', 'button'); hint.tabIndex = 0;
+        hint.textContent = '\u25BC  SCROLL OR PRESS ENTER TO LOG ON  \u25BC';
+        var logon = function(){ var b = document.querySelector('.box'); if (b) b.scrollIntoView({ behavior:'smooth', block:'start' }); };
+        hint.addEventListener('click', logon);
+        hint.addEventListener('keydown', function(e){ if (e.key === 'Enter') logon(); });
+        logo.appendChild(hint);
+        document.addEventListener('keydown', function(e){
+            var tag = (e.target && e.target.tagName) || '';
+            if (e.key === 'Enter' && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'BUTTON' && tag !== 'A' && window.scrollY < 40) logon();
+        });
+    }
     else logo.className = 'logo gone';
     nav.parentNode.insertBefore(logo, nav.nextSibling);
     var box = document.querySelector('.box');
