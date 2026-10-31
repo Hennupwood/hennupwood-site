@@ -331,6 +331,92 @@ window.HWCOUNT = (function(){
     };
 })();
 
+/* ---------- the black hole above the main menu ---------- */
+function blackHole(host){
+    var W = 240, H = 112, cv = document.createElement('canvas');
+    cv.width = W; cv.height = H; host.appendChild(cv);
+    var g = cv.getContext('2d');
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var CX = W / 2, CY = H / 2 + 4, RH = 13, TILT = 0.26, RIN = 17, ROUT = 86;
+    var disk = [], fall = [], t0 = performance.now(), nextFall = 0, ufo = null, nextUfo = performance.now() + 25000 + Math.random() * 35000;
+    for (var i = 0; i < 900; i++){
+        var r = RIN + Math.pow(Math.random(), 1.6) * (ROUT - RIN);
+        disk.push({ a:Math.random() * Math.PI * 2, r:r, w:0.9 / Math.pow(r / RIN, 1.5) * 0.045, j:Math.random() });
+    }
+    function col(r, j){
+        var k = (r - RIN) / (ROUT - RIN);
+        if (k < 0.08) return '#ffffff';
+        if (k < 0.2)  return j < 0.5 ? '#ffff55' : '#ffffff';
+        if (k < 0.38) return j < 0.6 ? '#ff55ff' : '#ffff55';
+        if (k < 0.62) return j < 0.7 ? '#aa00aa' : '#ff55ff';
+        return j < 0.6 ? '#5555ff' : '#0000aa';
+    }
+    function px(x, y, c){ g.fillStyle = c; g.fillRect(x | 0, y | 0, 1, 1); }
+    function spawnFall(){
+        var a = Math.random() * Math.PI * 2;
+        fall.push({ a:a, r:ROUT + 10 + Math.random() * 20, life:0 });
+    }
+    var UFO = ["...MM...","..MMMM..",".MMWWMM.","MMWkkWMM",".MMWWMM.","..M..M.."], UC = { M:'#ff55ff', W:'#ffffff', k:'#000000' };
+    function frame(now){
+        var dt = 1;
+        g.clearRect(0, 0, W, H);
+        /* soft glow behind everything */
+        var grad = g.createRadialGradient(CX, CY, RH, CX, CY, ROUT * 0.9);
+        grad.addColorStop(0, 'rgba(170,0,170,0.35)'); grad.addColorStop(0.5, 'rgba(85,0,120,0.12)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = grad; g.beginPath(); g.ellipse(CX, CY, ROUT, ROUT * 0.55, 0, 0, Math.PI * 2); g.fill();
+
+        if (!still) disk.forEach(function(p){ p.a += p.w * dt; });
+        /* back half of the disk (behind the hole) */
+        disk.forEach(function(p){
+            var s = Math.sin(p.a); if (s >= 0) return;
+            px(CX + Math.cos(p.a) * p.r, CY + s * p.r * TILT, col(p.r, p.j));
+        });
+        /* light from the back of the disk bent over the top of the hole */
+        disk.forEach(function(p){
+            if (Math.sin(p.a) >= 0 || p.r > RIN + 22) return;
+            var rr = RH + 2 + (p.r - RIN) * 0.55, c = Math.cos(p.a);
+            px(CX + c * rr, CY - Math.sqrt(Math.max(0, rr * rr - (c * rr) * (c * rr))) * 0.98, col(p.r, p.j));
+        });
+        /* falling stars spiralling in */
+        if (!still && now > nextFall){ spawnFall(); nextFall = now + 300 + Math.random() * 900; }
+        for (var f = fall.length - 1; f >= 0; f--){
+            var q = fall[f];
+            if (!still){ q.a += 0.6 / q.r * 2; q.r -= 0.12 + 18 / q.r; q.life++; }
+            if (q.r <= RH){ fall.splice(f, 1); continue; }
+            var x = CX + Math.cos(q.a) * q.r, y = CY + Math.sin(q.a) * q.r * TILT * 1.6;
+            px(x, y, q.r < RIN + 6 ? '#ffff55' : '#ffffff');
+            px(x - Math.cos(q.a + 1.57) * 1, y - Math.sin(q.a + 1.57) * 0.5, '#aaaaaa');
+        }
+        /* the hole itself, with its photon ring */
+        g.fillStyle = '#000'; g.beginPath(); g.arc(CX, CY, RH, 0, Math.PI * 2); g.fill();
+        for (var k = 0; k < 120; k++){
+            var a = k / 120 * Math.PI * 2;
+            var flick = (Math.sin(a * 3 + now / 300) + 1) / 2;
+            px(CX + Math.cos(a) * (RH + 0.6), CY + Math.sin(a) * (RH + 0.6), flick > 0.55 ? '#ffffff' : '#ffff55');
+        }
+        /* front half of the disk (in front of the hole) */
+        disk.forEach(function(p){
+            var s = Math.sin(p.a); if (s < 0) return;
+            px(CX + Math.cos(p.a) * p.r, CY + s * p.r * TILT, col(p.r, p.j));
+        });
+        /* now and then a UFO gets too close... */
+        if (!still && !ufo && now > nextUfo){ ufo = { a:Math.PI, r:ROUT + 25, rot:0 }; nextUfo = now + 45000 + Math.random() * 60000; }
+        if (ufo){
+            ufo.a += 0.9 / ufo.r; ufo.r -= 0.06 + 6 / ufo.r; ufo.rot += 0.02;
+            var sc = Math.max(0.15, Math.min(1, (ufo.r - RH) / 40));
+            var ux = CX + Math.cos(ufo.a) * ufo.r, uy = CY + Math.sin(ufo.a) * ufo.r * TILT * 1.6;
+            for (var yy = 0; yy < UFO.length; yy++) for (var xx = 0; xx < 8; xx++){
+                var ch = UFO[yy][xx]; if (ch === '.') continue;
+                g.fillStyle = UC[ch];
+                g.fillRect((ux + (xx - 4) * sc) | 0, (uy + (yy - 3) * sc) | 0, Math.max(1, sc) | 0 || 1, Math.max(1, sc) | 0 || 1);
+            }
+            if (ufo.r <= RH + 1) ufo = null;
+        }
+        if (!still) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+}
+
 /* ---------- menu bar under the logo, sticks to the top ---------- */
 (function(){
     var logo = document.querySelector('.logo');
@@ -351,14 +437,21 @@ window.HWCOUNT = (function(){
     var navCss = ''
      + '.topnav{position:sticky;top:0;z-index:100;background:#000;margin:-10px -30px 0;padding:10px 30px;'
      +   'border-bottom:2px solid #aa00aa;box-shadow:0 6px 16px -6px #8800aa;'
-     +   'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;font-size:15px;}'
+     +   'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 8px;font-size:14px;}'
      + '.topnav a{color:#00ffff;padding:2px 4px;white-space:nowrap;}'
      + '.topnav a .br{color:#ff00ff;}'
      + '.topnav a:hover{color:#ffff00;}'
      + '.topnav a.here{background:#0000aa;color:#fff;}'
      + '.topnav a.here .br{color:#ffff00;}'
+     + '.topnav{align-items:center;}'
+     + '.topnav a.brand{padding:0;margin-right:10px;display:inline-flex;align-items:center;}'
+     + '.topnav a.brand img{height:34px;width:auto;display:block;transform:none;filter:drop-shadow(0 0 6px #0000aa);}'
+     + '.topnav a.brand:hover img{filter:drop-shadow(0 0 8px #ff00ff);}'
+     + '.logo.bh{margin:0 auto 10px;text-align:center;}'
+     + '.logo.bh canvas{width:min(760px,100%);height:auto;image-rendering:pixelated;display:block;margin:0 auto;}'
+     + '.logo.gone{display:none;}'
      + '.bulletin{scroll-margin-top:80px !important;}'
-     + '@media (max-width:600px){.topnav{font-size:13px;gap:2px 10px;margin:-10px -16px 0;padding:8px 16px;}}';
+     + '@media (max-width:600px){.topnav{font-size:13px;gap:2px 10px;margin:-10px -16px 0;padding:8px 16px;}.topnav a.brand{width:100%;justify-content:center;margin:0 0 4px;}.topnav a.brand img{height:26px;}}';
     var ns = document.createElement('style');
     ns.textContent = navCss;
     document.head.appendChild(ns);
@@ -366,6 +459,13 @@ window.HWCOUNT = (function(){
     var nav = document.createElement('nav');
     nav.className = 'topnav';
     nav.setAttribute('aria-label', 'Main menu');
+    var logoImg = logo.querySelector('img');
+    if (logoImg){
+        var brand = document.createElement('a');
+        brand.className = 'brand'; brand.href = 'index.html'; brand.title = 'Hennupwood BBS — main menu';
+        brand.innerHTML = '<img src="' + logoImg.getAttribute('src') + '" alt="Hennupwood">';
+        nav.appendChild(brand);
+    }
     items.forEach(function(it){
         var a = document.createElement('a');
         a.href = it[1];
@@ -381,6 +481,9 @@ window.HWCOUNT = (function(){
     nav.appendChild(tb);
     logo.parentNode.insertBefore(nav, logo.nextSibling);
     logo.style.marginBottom = '0';
+    if (page === 'index'){ logo.innerHTML = ''; logo.className = 'logo bh'; logo.setAttribute('aria-hidden', 'true'); blackHole(logo); }
+    else logo.className = 'logo gone';
+    nav.parentNode.insertBefore(logo, nav.nextSibling);
     var box = document.querySelector('.box');
     if (box) box.style.marginTop = '30px';
 })();
@@ -653,13 +756,14 @@ function run(raw, fromTerm){
 }
 
 /* ---------- pop-up terminal (term.js is loaded the first time) ---------- */
+var TERM_VERSION = '2';      // raise this whenever term.js changes, so browsers fetch the new one
 var termLoading = false;
 function openTerm(){
     if (window.HWTERM){ HWTERM.toggle(); return; }
     if (termLoading) return;
     termLoading = true;
     var s = document.createElement('script');
-    s.src = 'term.js';
+    s.src = 'term.js?v=' + TERM_VERSION;
     s.onload = function(){ termLoading = false; if (window.HWTERM) HWTERM.open(); };
     s.onerror = function(){ termLoading = false; print('TERMINAL COULD NOT LOAD.', 'l-err'); };
     document.body.appendChild(s);
