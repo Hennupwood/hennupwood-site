@@ -821,6 +821,23 @@ function run(raw, fromTerm){
         return;
     case 'ATH': case '+++': case 'ATH0':
         print('NO CARRIER', 'l-err'); return;
+    case 'THERE':
+        if (!/^THERE IT IS/.test(cmd)) break;
+        if (!window.HWSTARS){ print('CAN YOU SEE IT? ...NOT FROM HERE.', 'l-ok'); return; }
+        slow(['THERE IT IS...', { t:'CAN YOU SEE IT?', c:'l-pk' }], 'l-hi');
+        HWSTARS.ufo(true);
+        [700, 1600, 2600, 3800].forEach(function(ms, k){ setTimeout(function(){ HWSTARS.ufo(k === 2); }, ms); });
+        return;
+    case 'ALL':
+        if (!/^ALL THOSE COLOU?RS/.test(cmd)) break;
+        slow([{ t:'ALL', c:'l-pk' }, { t:'THOSE', c:'l-hi' }, { t:'COLORS...', c:'l-cmd' }], 'l-hi');
+        rainbow();
+        if (window.HWSTARS){
+            HWSTARS.meteor(true);
+            [0, 900, 1800].forEach(function(ms){ setTimeout(function(){ HWSTARS.nova(); }, ms); });
+            setTimeout(function(){ HWSTARS.meteor(true); }, 1500);
+        }
+        return;
     case 'METEOR': case 'METEORS': case 'SHOWER':
         if (window.HWSTARS && HWSTARS.meteor(cmd !== 'METEOR')) print(cmd === 'METEOR' ? 'MAKE A WISH.' : 'METEOR SHOWER INCOMING. MAKE A FEW WISHES.', 'l-hi');
         else print('CLOUDY TONIGHT. NO METEORS.', 'l-ok');
