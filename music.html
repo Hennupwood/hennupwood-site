@@ -207,10 +207,19 @@ canvas{
     .trow .yr, .trow .du, .trow .pc{ display:none; }
 }
 
+
+html.embed .box > div:not(.scwrap):not(.status):not(.tracks):not(.term-out):not(.prompt){ display:none; }
+html.embed .box > br{ display:none; }
+html.embed .scwrap{ margin-top:0; border-width:6px; box-shadow:none; }
+html.embed .scwrap iframe{ height:120px; }
+html.embed .trow{ grid-template-columns:auto 44px minmax(0,1fr) auto; gap:0 10px; padding:4px; }
+html.embed .trow img, html.embed .trow .noart{ width:44px; height:44px; }
+html.embed .trow .yr, html.embed .trow .du, html.embed .trow .pc{ display:none; }
 </style>
 </head>
 
 <body data-page="music">
+<script>if (/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embed');</script>
 
 <div class="wrapper">
 

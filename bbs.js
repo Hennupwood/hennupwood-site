@@ -2,6 +2,18 @@
    One file, used on every page. */
 (function(){
 
+/* ---------- embed mode: a page shown inside a window on the board ---------- */
+if (/[?&]embed=1/.test(location.search)){
+    var es = document.createElement('style');
+    es.textContent = 'body{background:#000 !important;}'
+      + '.wrapper{padding:8px 10px !important;max-width:none !important;}'
+      + '.logo,.footer,.prompt,.term-out,.ansi-line{display:none !important;}'
+      + '.box{margin:0 !important;padding:6px 4px !important;border:0 !important;box-shadow:none !important;background:transparent !important;}';
+    document.head.appendChild(es);
+    document.documentElement.classList.add('embed');
+    return;
+}
+
 /* ---------- where things live ---------- */
 var LINKS = {
     main:'index.html', archives:'archives.html', about:'about.html', art:'art.html',
@@ -697,6 +709,7 @@ function run(raw, fromTerm){
     if (!fromTerm) print('COMMAND > ' + cmd, 'l-cmd');
 
     var nums = NUMS[page] || {};
+    if (nums[cmd] === 'music' && page !== 'music'){ print('OPENING THE MUSIC PLAYER...', 'l-bl'); openMusic(); return true; }
     if (nums[cmd]){ go(nums[cmd]); return true; }
 
     var w = cmd.split(' ')[0];
@@ -729,7 +742,7 @@ function run(raw, fromTerm){
         return;
 
     case 'MAIN': case 'M': case 'MENU': case 'HOME': go('main'); return;
-    case 'MUSIC': go('music'); return;
+    case 'MUSIC': if (page === 'music') return; print('OPENING THE MUSIC PLAYER...', 'l-bl'); openMusic(); return;
     case 'SOUNDCLOUD': case 'SC': go('soundcloud'); return;
     case 'MIXCLOUD': go('mixcloud'); return;
     case 'YOUTUBE': go('youtube'); return;
@@ -857,6 +870,90 @@ function run(raw, fromTerm){
     print('BAD COMMAND OR FILE NAME', 'l-err');
     return false;
 }
+
+/* ---------- music window: the music page in a window you can move and resize ---------- */
+var musicWin = null;
+function openMusic(){
+    if (page === 'music'){ return; }
+    if (musicWin){ musicWin.classList.remove('mini'); musicWin.style.display = 'flex'; return; }
+    var css = ''
+      + '#hwmusic{position:fixed;z-index:880;display:flex;flex-direction:column;background:#000;border:3px double #aa00aa;'
+      +   'box-shadow:0 0 30px #8800aa,0 0 70px #440055;min-width:300px;min-height:120px;font-family:"Courier New",monospace;}'
+      + '#hwmusic .bar{display:flex;align-items:center;gap:8px;background:#aa00aa;color:#fff;padding:4px 8px;cursor:move;user-select:none;-webkit-user-select:none;font-size:13px;letter-spacing:1px;}'
+      + '#hwmusic .bar .tt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
+      + '#hwmusic .bar button{font:inherit;background:#000;color:#ffff55;border:1px solid #fff;padding:0 7px;cursor:pointer;}'
+      + '#hwmusic iframe{flex:1;width:100%;border:0;background:#000;}'
+      + '#hwmusic .grip{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;'
+      +   'background:linear-gradient(135deg,transparent 50%,#ff55ff 50%,#ff55ff 60%,transparent 60%,transparent 70%,#ff55ff 70%,#ff55ff 80%,transparent 80%);}'
+      + '#hwmusic.mini{min-height:0;height:auto !important;}'
+      + '#hwmusic.mini iframe{height:0;flex:0;}'
+      + '#hwmusic.mini .grip{display:none;}'
+      + '@media (max-width:640px){#hwmusic{left:0 !important;right:0;top:auto !important;bottom:0;width:100% !important;height:55vh !important;border-width:3px 0 0 0;}#hwmusic .grip{display:none;}#hwmusic.mini{height:auto !important;}}';
+    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem('hw-music-win') || '{}'); } catch(e){ saved = {}; }
+    var w = Math.min(saved.w || 460, window.innerWidth - 20), h = Math.min(saved.h || 520, window.innerHeight - 40);
+    var x = saved.x != null ? Math.min(saved.x, window.innerWidth - 120) : window.innerWidth - w - 24;
+    var y = saved.y != null ? Math.min(saved.y, window.innerHeight - 60) : 90;
+
+    musicWin = document.createElement('div');
+    musicWin.id = 'hwmusic';
+    musicWin.setAttribute('role', 'dialog');
+    musicWin.setAttribute('aria-label', 'Music player');
+    musicWin.style.cssText = 'left:' + Math.max(0, x) + 'px;top:' + Math.max(0, y) + 'px;width:' + w + 'px;height:' + h + 'px;';
+    musicWin.innerHTML = '<div class="bar"><span class="tt">\u266B HENNUPWOOD \u2014 MUSIC</span>'
+        + '<button data-a="mini" title="Fold in (music keeps playing)">_</button>'
+        + '<button data-a="page" title="Open the full music page">PAGE</button>'
+        + '<button data-a="close" title="Close (stops the music)">X</button></div>'
+        + '<iframe src="music.html?embed=1" title="Hennupwood music player" allow="autoplay"></iframe>'
+        + '<div class="grip" title="Drag to resize"></div>';
+    document.body.appendChild(musicWin);
+
+    function save(){
+        try { localStorage.setItem('hw-music-win', JSON.stringify({ x:musicWin.offsetLeft, y:musicWin.offsetTop, w:musicWin.offsetWidth, h:musicWin.offsetHeight })); } catch(e){}
+    }
+    /* while dragging, a cover keeps the iframe from swallowing the mouse */
+    var cover = document.createElement('div');
+    cover.style.cssText = 'position:fixed;inset:0;z-index:890;cursor:move;display:none;';
+    document.body.appendChild(cover);
+    function track(e, kind){
+        e.preventDefault();
+        var sx = e.clientX, sy = e.clientY, ox = musicWin.offsetLeft, oy = musicWin.offsetTop, ow = musicWin.offsetWidth, oh = musicWin.offsetHeight;
+        cover.style.cursor = kind === 'move' ? 'move' : 'nwse-resize'; cover.style.display = 'block';
+        function mv(ev){
+            var dx = ev.clientX - sx, dy = ev.clientY - sy;
+            if (kind === 'move'){
+                musicWin.style.left = Math.max(0, Math.min(window.innerWidth - 100, ox + dx)) + 'px';
+                musicWin.style.top = Math.max(0, Math.min(window.innerHeight - 30, oy + dy)) + 'px';
+            } else {
+                musicWin.style.width = Math.max(300, Math.min(window.innerWidth - ox, ow + dx)) + 'px';
+                musicWin.style.height = Math.max(120, Math.min(window.innerHeight - oy, oh + dy)) + 'px';
+            }
+        }
+        function up(){ cover.style.display = 'none'; window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); save(); }
+        window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+    }
+    musicWin.querySelector('.bar').addEventListener('pointerdown', function(e){
+        if (e.target.tagName === 'BUTTON' || window.innerWidth <= 640) return;
+        track(e, 'move');
+    });
+    musicWin.querySelector('.grip').addEventListener('pointerdown', function(e){ track(e, 'size'); });
+    musicWin.querySelector('.bar').addEventListener('click', function(e){
+        var a = e.target.getAttribute && e.target.getAttribute('data-a');
+        if (a === 'mini') musicWin.classList.toggle('mini');
+        if (a === 'page') location.href = 'music.html';
+        if (a === 'close'){ musicWin.parentNode.removeChild(musicWin); cover.parentNode.removeChild(cover); musicWin = null; }
+    });
+    if (window.HWCOUNT) HWCOUNT.event('music/window', 'MUSIC window opened');
+}
+/* MUSIC links open the window instead of leaving the page */
+document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || page === 'music' || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    var href = a.getAttribute('href');
+    if (href === 'music.html'){ e.preventDefault(); openMusic(); }
+});
 
 /* ---------- pop-up terminal (term.js is loaded the first time) ---------- */
 var TERM_VERSION = '2';      // raise this whenever term.js changes, so browsers fetch the new one
