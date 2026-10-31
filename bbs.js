@@ -48,7 +48,7 @@ var NUMS = {
     mods:     { '0':'main' },
     whitelabel:{ '0':'mods' },
     contact:  { '0':'main' },
-    bulletins:{ '1':'#b1', '2':'#b2', '3':'#b3', '4':'#b4', '5':'#b5', '6':'#b6', '7':'#b7', '8':'#b8', '0':'main' },
+    bulletins:{ '1':'#b1', '2':'#b2', '3':'#b3', '4':'#b4', '5':'#b5', '6':'#b6', '7':'#b7', '8':'#b8', '9':'#b9', '0':'main' },
     about:    { '1':'soundcloud', '2':'mixcloud', '3':'youtube', '4':'facebook', '0':'main' },
     archives: { '0':'main' },
     art:      { '0':'main' },
@@ -913,7 +913,7 @@ var WM = (function(){
           + '.hwwin .grip{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;'
           +   'background:linear-gradient(135deg,transparent 50%,#ff55ff 50%,#ff55ff 60%,transparent 60%,transparent 70%,#ff55ff 70%,#ff55ff 80%,transparent 80%);}'
           + '.hwwin.mini{display:none;}'
-          + '#hwtask{position:fixed;left:0;right:0;bottom:0;z-index:2000;display:none;align-items:center;gap:6px;flex-wrap:wrap;'
+          + '#hwtask{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:none;align-items:center;gap:6px;flex-wrap:wrap;'
           +   'background:#000;border-top:2px solid #aa00aa;box-shadow:0 -6px 16px -6px #8800aa;padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px));'
           +   'font-family:"Courier New",monospace;font-size:13px;}'
           + '#hwtask.on{display:flex;}'
@@ -927,7 +927,7 @@ var WM = (function(){
           +   '.hwwin .grip{display:none;}.hwwin .bar{cursor:default;}}';
         var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
         cover = document.createElement('div');
-        cover.style.cssText = 'position:fixed;inset:0;z-index:5000;display:none;';
+        cover.style.cssText = 'position:fixed;inset:0;z-index:2147483600;display:none;';
         document.body.appendChild(cover);
         task = document.createElement('div'); task.id = 'hwtask';
         document.body.appendChild(task);
