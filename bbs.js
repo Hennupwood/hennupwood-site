@@ -3,15 +3,29 @@
 (function(){
 
 /* ---------- embed mode: a page shown inside a window on the board ---------- */
-if (/[?&]embed=1/.test(location.search)){
+var EMBED = /[?&]embed=1/.test(location.search) && window.parent !== window;
+if (EMBED){
     var es = document.createElement('style');
     es.textContent = 'body{background:#000 !important;}'
       + '.wrapper{padding:8px 10px !important;max-width:none !important;}'
-      + '.logo,.footer,.prompt,.term-out,.ansi-line{display:none !important;}'
+      + '.logo,.footer,.prompt,.term-out{display:none !important;}'
       + '.box{margin:0 !important;padding:6px 4px !important;border:0 !important;box-shadow:none !important;background:transparent !important;}';
     document.head.appendChild(es);
     document.documentElement.classList.add('embed');
-    return;
+    /* links to other board pages stay inside the window */
+    document.addEventListener('click', function(e){
+        var a = e.target.closest && e.target.closest('a[href]');
+        if (!a || a.target === '_blank' || e.ctrlKey || e.metaKey) return;
+        var h = a.getAttribute('href');
+        if (!/^[a-z0-9_-]+\.html(#.*)?$/i.test(h)) return;
+        e.preventDefault();
+        var p = h.split('#');
+        location.href = p[0] + '?embed=1' + (p[1] ? '#' + p[1] : '');
+    }, true);
+    /* F2 inside a window opens the board's terminal */
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'F2'){ e.preventDefault(); try { window.parent.HWBBS.openTerm(); } catch(err){} }
+    });
 }
 
 /* ---------- where things live ---------- */
@@ -81,6 +95,7 @@ var GC_SITE = 'https://hennupwood.goatcounter.com';
     s.async = true;
     s.src = 'https://gc.zgo.at/count.js';
     s.setAttribute('data-goatcounter', GC_SITE + '/count');
+    if (EMBED) s.setAttribute('data-goatcounter-settings', '{"no_onload": true}');
     document.head.appendChild(s);
 })();
 
@@ -132,6 +147,8 @@ window.HWCOUNT = (function(){
         document.getElementById('callers').textContent = n ? n : 'UNKNOWN';
     });
 })();
+
+if (EMBED) return;
 
 /* ---------- starfield behind the board (like the Space Raid title screen) ----------
    On the MOD AREA it dances along with the music: HWSTARS.beat() / HWSTARS.level() */
@@ -665,6 +682,11 @@ function go(where){
     if (where.charAt(0) === '#'){ print('READING BULLETIN ' + where.slice(2) + '...', 'l-bl'); window.location.hash = where; return; }
     var url = LINKS[where];
     if (!url) return;
+    var wid = (/^([a-z]+)\.html$/.exec(url) || [])[1];
+    if (wid && wid !== 'index' && wid !== page && WINTITLE[wid]){
+        print('OPENING ' + where.toUpperCase() + '...', 'l-bl');
+        WM.open(wid); return;
+    }
     print('LOADING ' + where.toUpperCase() + '...', 'l-bl');
     setTimeout(function(){
         if (/^https?:/.test(url)) window.open(url, '_blank', 'noopener');
@@ -871,88 +893,152 @@ function run(raw, fromTerm){
     return false;
 }
 
-/* ---------- music window: the music page in a window you can move and resize ---------- */
-var musicWin = null;
-function openMusic(){
-    if (page === 'music'){ return; }
-    if (musicWin){ musicWin.classList.remove('mini'); musicWin.style.display = 'flex'; return; }
-    var css = ''
-      + '#hwmusic{position:fixed;z-index:880;display:flex;flex-direction:column;background:#000;border:3px double #aa00aa;'
-      +   'box-shadow:0 0 30px #8800aa,0 0 70px #440055;min-width:300px;min-height:120px;font-family:"Courier New",monospace;}'
-      + '#hwmusic .bar{display:flex;align-items:center;gap:8px;background:#aa00aa;color:#fff;padding:4px 8px;cursor:move;user-select:none;-webkit-user-select:none;font-size:13px;letter-spacing:1px;}'
-      + '#hwmusic .bar .tt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
-      + '#hwmusic .bar button{font:inherit;background:#000;color:#ffff55;border:1px solid #fff;padding:0 7px;cursor:pointer;}'
-      + '#hwmusic iframe{flex:1;width:100%;border:0;background:#000;}'
-      + '#hwmusic .grip{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;'
-      +   'background:linear-gradient(135deg,transparent 50%,#ff55ff 50%,#ff55ff 60%,transparent 60%,transparent 70%,#ff55ff 70%,#ff55ff 80%,transparent 80%);}'
-      + '#hwmusic.mini{min-height:0;height:auto !important;}'
-      + '#hwmusic.mini iframe{height:0;flex:0;}'
-      + '#hwmusic.mini .grip{display:none;}'
-      + '@media (max-width:640px){#hwmusic{left:0 !important;right:0;top:auto !important;bottom:0;width:100% !important;height:55vh !important;border-width:3px 0 0 0;}#hwmusic .grip{display:none;}#hwmusic.mini{height:auto !important;}}';
-    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
-
-    var saved = {};
-    try { saved = JSON.parse(localStorage.getItem('hw-music-win') || '{}'); } catch(e){ saved = {}; }
-    var w = Math.min(saved.w || 460, window.innerWidth - 20), h = Math.min(saved.h || 520, window.innerHeight - 40);
-    var x = saved.x != null ? Math.min(saved.x, window.innerWidth - 120) : window.innerWidth - w - 24;
-    var y = saved.y != null ? Math.min(saved.y, window.innerHeight - 60) : 90;
-
-    musicWin = document.createElement('div');
-    musicWin.id = 'hwmusic';
-    musicWin.setAttribute('role', 'dialog');
-    musicWin.setAttribute('aria-label', 'Music player');
-    musicWin.style.cssText = 'left:' + Math.max(0, x) + 'px;top:' + Math.max(0, y) + 'px;width:' + w + 'px;height:' + h + 'px;';
-    musicWin.innerHTML = '<div class="bar"><span class="tt">\u266B HENNUPWOOD \u2014 MUSIC</span>'
-        + '<button data-a="mini" title="Fold in (music keeps playing)">_</button>'
-        + '<button data-a="page" title="Open the full music page">PAGE</button>'
-        + '<button data-a="close" title="Close (stops the music)">X</button></div>'
-        + '<iframe src="music.html?embed=1" title="Hennupwood music player" allow="autoplay"></iframe>'
-        + '<div class="grip" title="Drag to resize"></div>';
-    document.body.appendChild(musicWin);
-
-    function save(){
-        try { localStorage.setItem('hw-music-win', JSON.stringify({ x:musicWin.offsetLeft, y:musicWin.offsetTop, w:musicWin.offsetWidth, h:musicWin.offsetHeight })); } catch(e){}
+/* ---------- windows, DESQview style: every board page can open in a window ---------- */
+var WINTITLE = { music:'\u266B MUSIC', archives:'ARCHIVES', about:'ABOUT', art:'ANSI ART', mods:'MOD AREA', videos:'VIDEOS',
+                 games:'DOOR GAMES', raid:'SPYCO SPACE RAID', tower:"THE SYSOP'S TOWER", chess:'SYSOP CHESS',
+                 bulletins:'BULLETINS', links:'OTHER BOARDS', contact:'CONTACT', whitelabel:'WHITE LABEL' };
+var WM = (function(){
+    var wins = {}, z = 880, task = null, cover = null, styled = false, count = 0;
+    function style(){
+        if (styled) return; styled = true;
+        var css = ''
+          + '.hwwin{position:fixed;display:flex;flex-direction:column;background:#000;border:3px double #aa00aa;'
+          +   'box-shadow:0 0 24px #550077;min-width:300px;min-height:120px;font-family:"Courier New",monospace;}'
+          + '.hwwin.top{border-color:#ff55ff;box-shadow:0 0 30px #8800aa,0 0 70px #440055;}'
+          + '.hwwin .bar{display:flex;align-items:center;gap:6px;background:#550077;color:#ddd;padding:4px 8px;cursor:move;user-select:none;-webkit-user-select:none;font-size:13px;letter-spacing:1px;}'
+          + '.hwwin.top .bar{background:#aa00aa;color:#fff;}'
+          + '.hwwin .bar .tt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
+          + '.hwwin .bar button{font:inherit;background:#000;color:#ffff55;border:1px solid #fff;padding:0 7px;cursor:pointer;}'
+          + '.hwwin iframe{flex:1;width:100%;border:0;background:#000;}'
+          + '.hwwin .grip{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;'
+          +   'background:linear-gradient(135deg,transparent 50%,#ff55ff 50%,#ff55ff 60%,transparent 60%,transparent 70%,#ff55ff 70%,#ff55ff 80%,transparent 80%);}'
+          + '.hwwin.mini{display:none;}'
+          + '#hwtask{position:fixed;left:0;right:0;bottom:0;z-index:2000;display:none;align-items:center;gap:6px;flex-wrap:wrap;'
+          +   'background:#000;border-top:2px solid #aa00aa;box-shadow:0 -6px 16px -6px #8800aa;padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px));'
+          +   'font-family:"Courier New",monospace;font-size:13px;}'
+          + '#hwtask.on{display:flex;}'
+          + '#hwtask .dv{color:#ff55ff;letter-spacing:2px;margin-right:6px;}'
+          + '#hwtask button{font:inherit;background:#000;color:#55ffff;border:1px solid #440055;padding:2px 9px;cursor:pointer;white-space:nowrap;}'
+          + '#hwtask button.top{background:#0000aa;color:#fff;border-color:#ff55ff;}'
+          + '#hwtask button.mini{color:#777;}'
+          + '#hwtask .clock{margin-left:auto;color:#ffff55;}'
+          + 'body.hw-task{padding-bottom:44px;}'
+          + '@media (max-width:640px){.hwwin{left:0 !important;top:0 !important;width:100% !important;height:calc(100% - 42px) !important;border-width:0;}'
+          +   '.hwwin .grip{display:none;}.hwwin .bar{cursor:default;}}';
+        var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+        cover = document.createElement('div');
+        cover.style.cssText = 'position:fixed;inset:0;z-index:5000;display:none;';
+        document.body.appendChild(cover);
+        task = document.createElement('div'); task.id = 'hwtask';
+        document.body.appendChild(task);
+        setInterval(drawTask, 20000);
     }
-    /* while dragging, a cover keeps the iframe from swallowing the mouse */
-    var cover = document.createElement('div');
-    cover.style.cssText = 'position:fixed;inset:0;z-index:890;cursor:move;display:none;';
-    document.body.appendChild(cover);
-    function track(e, kind){
-        e.preventDefault();
-        var sx = e.clientX, sy = e.clientY, ox = musicWin.offsetLeft, oy = musicWin.offsetTop, ow = musicWin.offsetWidth, oh = musicWin.offsetHeight;
+    function geo(id){ try { return JSON.parse(localStorage.getItem('hw-win-' + id) || 'null'); } catch(e){ return null; } }
+    function save(id, w){ try { localStorage.setItem('hw-win-' + id, JSON.stringify({ x:w.offsetLeft, y:w.offsetTop, w:w.offsetWidth, h:w.offsetHeight })); } catch(e){} }
+    function focus(id){
+        var w = wins[id]; if (!w) return;
+        w.el.classList.remove('mini'); w.el.style.zIndex = ++z;
+        Object.keys(wins).forEach(function(k){ wins[k].el.classList.toggle('top', k === id); });
+        drawTask();
+    }
+    function topId(){ var best = null, bz = -1; Object.keys(wins).forEach(function(k){ var zz = +wins[k].el.style.zIndex; if (!wins[k].el.classList.contains('mini') && zz > bz){ bz = zz; best = k; } }); return best; }
+    function drawTask(){
+        if (!task) return;
+        var ids = Object.keys(wins), top = topId();
+        task.classList.toggle('on', ids.length > 0);
+        document.body.classList.toggle('hw-task', ids.length > 0);
+        var d = new Date();
+        task.innerHTML = '<span class="dv">HENNUPWOOD DV</span>' + ids.map(function(k){
+            var cls = k === top ? 'top' : (wins[k].el.classList.contains('mini') ? 'mini' : '');
+            return '<button data-w="' + k + '" class="' + cls + '">' + wins[k].title + '</button>';
+        }).join('') + '<span class="clock">' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + '</span>';
+    }
+    function track(e, id, kind){
+        var w = wins[id].el; e.preventDefault(); focus(id);
+        var sx = e.clientX, sy = e.clientY, ox = w.offsetLeft, oy = w.offsetTop, ow = w.offsetWidth, oh = w.offsetHeight;
         cover.style.cursor = kind === 'move' ? 'move' : 'nwse-resize'; cover.style.display = 'block';
         function mv(ev){
             var dx = ev.clientX - sx, dy = ev.clientY - sy;
             if (kind === 'move'){
-                musicWin.style.left = Math.max(0, Math.min(window.innerWidth - 100, ox + dx)) + 'px';
-                musicWin.style.top = Math.max(0, Math.min(window.innerHeight - 30, oy + dy)) + 'px';
+                w.style.left = Math.max(-ow + 120, Math.min(window.innerWidth - 100, ox + dx)) + 'px';
+                w.style.top = Math.max(0, Math.min(window.innerHeight - 70, oy + dy)) + 'px';
             } else {
-                musicWin.style.width = Math.max(300, Math.min(window.innerWidth - ox, ow + dx)) + 'px';
-                musicWin.style.height = Math.max(120, Math.min(window.innerHeight - oy, oh + dy)) + 'px';
+                w.style.width = Math.max(300, Math.min(window.innerWidth - ox, ow + dx)) + 'px';
+                w.style.height = Math.max(120, Math.min(window.innerHeight - oy - 40, oh + dy)) + 'px';
             }
         }
-        function up(){ cover.style.display = 'none'; window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); save(); }
+        function up(){ cover.style.display = 'none'; window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); save(id, w); }
         window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
     }
-    musicWin.querySelector('.bar').addEventListener('pointerdown', function(e){
-        if (e.target.tagName === 'BUTTON' || window.innerWidth <= 640) return;
-        track(e, 'move');
+    function open(id){
+        style();
+        if (wins[id]){ focus(id); return; }
+        var g = geo(id), n = count++ % 6;
+        var w = Math.min(g ? g.w : (id === 'music' ? 460 : 820), window.innerWidth - 20);
+        var h = Math.min(g ? g.h : (id === 'music' ? 520 : 600), window.innerHeight - 90);
+        var x = g ? Math.min(g.x, window.innerWidth - 120) : (id === 'music' ? window.innerWidth - w - 24 : 60 + n * 34);
+        var y = g ? Math.min(g.y, window.innerHeight - 80) : 80 + n * 28;
+        var el = document.createElement('div');
+        el.className = 'hwwin';
+        el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', WINTITLE[id] || id);
+        el.style.cssText = 'left:' + Math.max(0, x) + 'px;top:' + Math.max(0, y) + 'px;width:' + w + 'px;height:' + h + 'px;';
+        el.innerHTML = '<div class="bar"><span class="tt">' + (WINTITLE[id] || id.toUpperCase()) + '</span>'
+            + '<button data-a="mini" title="Fold away (keeps running)">_</button>'
+            + '<button data-a="page" title="Open as a full page">PAGE</button>'
+            + '<button data-a="close" title="Close">X</button></div>'
+            + '<iframe src="' + id + '.html?embed=1" title="' + (WINTITLE[id] || id) + '" allow="autoplay; fullscreen"></iframe>'
+            + '<div class="grip" title="Drag to resize"></div>';
+        document.body.appendChild(el);
+        wins[id] = { el:el, title:WINTITLE[id] || id.toUpperCase() };
+        var fr = el.querySelector('iframe');
+        fr.addEventListener('load', function(){
+            try {
+                fr.contentWindow.addEventListener('pointerdown', function(){ focus(id); });
+                var t = (fr.contentDocument.title || '').replace(/\s*[\u2014-]\s*Hennupwood( Music)? BBS\s*$/i, '').replace(/^Hennupwood( Music)? BBS\s*[\u2014-]\s*/i, '');
+                if (t){ el.querySelector('.tt').textContent = t.toUpperCase(); wins[id].title = t.toUpperCase(); drawTask(); }
+            } catch(e){}
+        });
+        el.addEventListener('pointerdown', function(){ focus(id); });
+        el.querySelector('.bar').addEventListener('pointerdown', function(e){
+            if (e.target.tagName === 'BUTTON' || window.innerWidth <= 640) return;
+            track(e, id, 'move');
+        });
+        el.querySelector('.grip').addEventListener('pointerdown', function(e){ track(e, id, 'size'); });
+        el.querySelector('.bar').addEventListener('click', function(e){
+            var a = e.target.getAttribute && e.target.getAttribute('data-a');
+            if (a === 'mini'){ el.classList.add('mini'); el.classList.remove('top'); drawTask(); }
+            if (a === 'page'){ var src = fr.contentWindow ? fr.contentWindow.location.pathname.split('/').pop() : id + '.html'; location.href = src || (id + '.html'); }
+            if (a === 'close') close(id);
+        });
+        focus(id);
+        if (window.HWCOUNT) HWCOUNT.event('window/' + id, 'WINDOW ' + id);
+    }
+    function close(id){
+        var w = wins[id]; if (!w) return;
+        w.el.parentNode.removeChild(w.el); delete wins[id]; drawTask();
+    }
+    document.addEventListener('click', function(e){
+        var b = e.target.closest && e.target.closest('#hwtask button[data-w]');
+        if (!b) return;
+        var id = b.getAttribute('data-w'), w = wins[id];
+        if (!w) return;
+        if (w.el.classList.contains('mini') || topId() !== id) focus(id);
+        else { w.el.classList.add('mini'); w.el.classList.remove('top'); drawTask(); }
     });
-    musicWin.querySelector('.grip').addEventListener('pointerdown', function(e){ track(e, 'size'); });
-    musicWin.querySelector('.bar').addEventListener('click', function(e){
-        var a = e.target.getAttribute && e.target.getAttribute('data-a');
-        if (a === 'mini') musicWin.classList.toggle('mini');
-        if (a === 'page') location.href = 'music.html';
-        if (a === 'close'){ musicWin.parentNode.removeChild(musicWin); cover.parentNode.removeChild(cover); musicWin = null; }
-    });
-    if (window.HWCOUNT) HWCOUNT.event('music/window', 'MUSIC window opened');
-}
-/* MUSIC links open the window instead of leaving the page */
+    return { open:open, close:close };
+})();
+function openMusic(){ WM.open('music'); }
+/* board links open in a window instead of leaving the page (Ctrl+click still opens the page) */
 document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[href]');
-    if (!a || page === 'music' || e.ctrlKey || e.metaKey || e.shiftKey) return;
-    var href = a.getAttribute('href');
-    if (href === 'music.html'){ e.preventDefault(); openMusic(); }
+    if (!a || a.target === '_blank' || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+    if (a.closest('#hwtask')) return;
+    var m = /^([a-z]+)\.html(#.*)?$/i.exec(a.getAttribute('href') || '');
+    if (!m) return;
+    var id = m[1].toLowerCase();
+    if (id === 'index' || id === page || !WINTITLE[id]) return;
+    e.preventDefault();
+    WM.open(id);
 });
 
 /* ---------- pop-up terminal (term.js is loaded the first time) ---------- */
