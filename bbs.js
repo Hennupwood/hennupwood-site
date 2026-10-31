@@ -200,6 +200,75 @@ window.HWCOUNT = (function(){
         }
     }
 
+    /* ---- meteors (shooting stars) and slowly tumbling asteroids ---- */
+    var meteors = [], rocks = [], nextMeteor = performance.now() + 6000 + Math.random() * 8000,
+        nextRock = performance.now() + 15000 + Math.random() * 25000;
+    var TAIL = ['#ffffff', '#ffff55', '#ffff55', '#ff5555', '#ff55ff', '#aa00aa', '#5555ff'];
+    function spawnMeteor(){
+        /* mostly in the open sky next to the board, so you actually see them */
+        var box = document.querySelector('.box'), r = box ? box.getBoundingClientRect() : null, x;
+        var left = r ? r.left / SCALE : 0, right = r ? (window.innerWidth - r.right) / SCALE : 0;
+        if (r && Math.max(left, right) > 25){
+            var useLeft = left > 25 && (right <= 25 || Math.random() < 0.5);
+            x = useLeft ? Math.random() * left : SW - Math.random() * right;
+        } else x = Math.random() * SW;
+        var ang = (0.25 + Math.random() * 0.35) * (Math.random() < 0.5 ? 1 : -1);      // steep diagonal fall
+        var sp = 3 + Math.random() * 3;
+        var y = -10 - Math.random() * SH * 0.3;
+        meteors.push({ x:x, y:y, vx:Math.sin(ang) * sp, vy:Math.cos(ang) * sp, len:14 + Math.random() * 22, life:0 });
+        return true;
+    }
+    function shower(){ var n = 3 + (Math.random() * 4 | 0); for (var k = 0; k < n; k++) setTimeout(spawnMeteor, k * (150 + Math.random() * 350)); return true; }
+    function drawMeteors(){
+        for (var i = meteors.length - 1; i >= 0; i--){
+            var m = meteors[i];
+            m.x += m.vx; m.y += m.vy; m.life++;
+            var sp = Math.hypot(m.vx, m.vy), ux = m.vx / sp, uy = m.vy / sp;
+            for (var s = 0; s < m.len; s++){
+                var k = s / m.len;
+                sg.globalAlpha = Math.max(0, 1 - k);
+                sg.fillStyle = TAIL[Math.min(TAIL.length - 1, Math.floor(k * TAIL.length))];
+                sg.fillRect((m.x - ux * s) | 0, (m.y - uy * s) | 0, 1, 1);
+            }
+            sg.globalAlpha = 1;
+            sg.fillStyle = '#ffffff'; sg.fillRect((m.x - 0.5) | 0, (m.y - 0.5) | 0, 2, 2);
+            if (m.y > SH + 40 || m.x < -60 || m.x > SW + 60) meteors.splice(i, 1);
+        }
+    }
+    function spawnRock(){
+        var R = 4 + Math.random() * 6, n = 14, shape = [], craters = [];
+        for (var k = 0; k < n; k++) shape.push(R * (0.72 + Math.random() * 0.35));
+        for (k = 0; k < 2 + (Math.random() * 3 | 0); k++) craters.push([Math.random() * 6.28, Math.random() * 0.6, 0.8 + Math.random() * 1.2]);
+        var left = Math.random() < 0.5;
+        rocks.push({ x:left ? -R * 2 : SW + R * 2, y:20 + Math.random() * (SH - 40), vx:(left ? 1 : -1) * (0.15 + Math.random() * 0.25),
+                     vy:(Math.random() - 0.5) * 0.12, R:R, shape:shape, craters:craters, rot:Math.random() * 6.28, spin:(Math.random() - 0.5) * 0.02,
+                     brown:Math.random() < 0.3 });
+        return true;
+    }
+    function rockR(r, a){
+        var n = r.shape.length, f = ((a - r.rot) / (Math.PI * 2) % 1 + 1) % 1 * n, i0 = Math.floor(f) % n, i1 = (i0 + 1) % n, t = f - Math.floor(f);
+        return r.shape[i0] * (1 - t) + r.shape[i1] * t;
+    }
+    function drawRocks(){
+        for (var i = rocks.length - 1; i >= 0; i--){
+            var r = rocks[i]; r.x += r.vx; r.y += r.vy; r.rot += r.spin;
+            var cx = r.x | 0, cy = r.y | 0, R = Math.ceil(r.R) + 1;
+            var light = r.brown ? '#aa5500' : '#aaaaaa', mid = r.brown ? '#aa5500' : '#555555', dark = r.brown ? '#552200' : '#333333';
+            for (var y = -R; y <= R; y++) for (var x = -R; x <= R; x++){
+                var d = Math.hypot(x, y), a = Math.atan2(y, x), edge = rockR(r, a);
+                if (d > edge) continue;
+                var shade = (-x - y) / (R * 1.4) + 0.2 * (1 - d / edge);          // lit from the top left
+                var c = shade > 0.35 ? light : shade > -0.25 ? mid : dark;
+                for (var k = 0; k < r.craters.length; k++){
+                    var cr = r.craters[k], ca = cr[0] + r.rot, cd = cr[1] * edge;
+                    if (Math.hypot(x - Math.cos(ca) * cd, y - Math.sin(ca) * cd) < cr[2]) c = dark;
+                }
+                sg.fillStyle = c; sg.fillRect(cx + x, cy + y, 1, 1);
+            }
+            if (r.x < -40 || r.x > SW + 40) rocks.splice(i, 1);
+        }
+    }
+
     /* ---- UFOs: the aliens from SPYCO SPACE RAID come by now and then ---- */
     var UPAL = { M:'#ff55ff', W:'#ffffff', k:'#000000', C:'#55ffff', Y:'#ffff55', B:'#5555ff', R:'#ff5555' };
     var USPR = [
@@ -315,6 +384,13 @@ window.HWCOUNT = (function(){
                 nextUfo = now + 40000 + Math.random() * 60000;
             }
             if (ufos.length) drawUfos(now);
+            if (now > nextMeteor){
+                if (Math.random() < 0.15) shower(); else spawnMeteor();
+                nextMeteor = now + 9000 + Math.random() * 16000;
+            }
+            if (now > nextRock){ spawnRock(); nextRock = now + 45000 + Math.random() * 45000; }
+            if (rocks.length) drawRocks();
+            if (meteors.length) drawMeteors();
         }
         boost *= 0.9; flash *= 0.9; lvl *= 0.92;
     }
@@ -327,7 +403,9 @@ window.HWCOUNT = (function(){
         beat: function(strength){ if (still) return; beats++; boost = Math.min(1, boost + (strength || 0.6)); flash = 1; },
         level: function(l){ if (!still) lvl = Math.max(lvl, Math.min(1, l)); },
         nova: function(){ return still ? false : spawnNova(); },
-        ufo: function(meet){ return still ? false : spawnUfo(meet); }
+        ufo: function(meet){ return still ? false : spawnUfo(meet); },
+        meteor: function(many){ return still ? false : (many ? shower() : spawnMeteor()); },
+        asteroid: function(){ return still ? false : spawnRock(); }
     };
 })();
 
@@ -691,6 +769,14 @@ function run(raw, fromTerm){
         return;
     case 'ATH': case '+++': case 'ATH0':
         print('NO CARRIER', 'l-err'); return;
+    case 'METEOR': case 'METEORS': case 'SHOWER':
+        if (window.HWSTARS && HWSTARS.meteor(cmd !== 'METEOR')) print(cmd === 'METEOR' ? 'MAKE A WISH.' : 'METEOR SHOWER INCOMING. MAKE A FEW WISHES.', 'l-hi');
+        else print('CLOUDY TONIGHT. NO METEORS.', 'l-ok');
+        return;
+    case 'ASTEROID': case 'ASTEROIDS': case 'ROCK':
+        if (window.HWSTARS && HWSTARS.asteroid()) print('ASTEROID ON A FLYBY. NO NEED TO PANIC. PROBABLY.', 'l-hi');
+        else print('THE SKY IS CLEAR.', 'l-ok');
+        return;
     case 'UFO': case 'UFOS':
         if (window.HWSTARS && HWSTARS.ufo(cmd === 'UFOS')) print(cmd === 'UFOS' ? 'TWO UFOS ON A COLLISION COURSE. WATCH THE SKY.' : 'UNIDENTIFIED FLYING OBJECT ON RADAR.', 'l-hi');
         else print('THE SKY IS CLOSED TODAY.', 'l-ok');
